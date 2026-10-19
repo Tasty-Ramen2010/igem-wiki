@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wet Lab Experiments — Denmark-GA iGEM 2025</title>
+    <base href="../">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/denmark.css">
+    <link rel="stylesheet" href="static/section-blocks.css">
+    <link rel="stylesheet" href="static/wiki-pages.css?v=792dfe22e192">
+  </head>
+  <body class="wiki-interior" data-page-family="lab">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+
+    <main>
+      <div class="page-hero">
+        <div class="container"><div class="chapter-intro">
+          <h1>Wet Lab</h1>
+          <p class="summary draft-summary">--</p>
+        </div></div>
+      </div>
+
+      <div class="wiki-reading-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-handle" aria-hidden="true">Table of Contents</div>
+      <nav class="toc-nav" id="toc-links" aria-label="Page sections">
+        <p class="toc-nav-heading">On this page</p>
+        
+        
+        
+        
+        
+      <a href="pages/wetlab.html#overview" data-toc="overview">Overview</a><a href="#materials-and-methods" data-toc="materials-and-methods">Materials  and Methods</a><a href="#existing-lockr-pipeline" data-toc="existing-lockr-pipeline">Existing LOCKR Pipeline</a><a href="#modified-binder-experimentation" data-toc="modified-binder-experimentation">Modified Binder Experimentation</a><a href="#mcshan-lab" data-toc="mcshan-lab">McShan Lab</a><a href="#genscript" data-toc="genscript">GenScript</a><a href="#references-3" data-toc="references-3">References</a></nav>
+    </aside>
+
+      <div class="page-content">
+        <div class="container">
+
+          
+          <section class="wiki-section toc-section" id="overview">
+            <h3>Overview</h3>
+            
+          <div class="section-block">
+<p>Our wet-lab works to test whether LATTE’s charge-optimization system meaningfully improves the function of our de-novo derived PfLDH-binding protein when it is integrated as LOCKR’s sensing domain in the LOCKR switch. Our de-novo binders were derived from a pipeline of RFDiffusion, ProteinMPNN, and AlphaFold, and we tested for target affinity using our own software, HybriDock-Pe. Then, LATTE runs a liability and charge scan to modify this binder, creating a charge-optimized version that reduces the electrostatic interference with cage-key thermodynamics. </p>
+<p>We are expressing three different constructs which isolate the effect of the charge-optimization and the tandem avidity, which is the combined binding strength of the two tandem binders. Our constructs include a cage with the original binder, a cage with the charge-optimized binder, and a tandem cage with two charge-optimized binders that are linked by a glycerin linker. The first pair isolates the effect of charge optimization while the second pair isolates the effect of tandem avidity. Here, we are using malaria as our proof-of-concept validator, with PfLDH, the malarial target and binders optimized for that target specifically.</p>
+<p>Before testing our constructs, we will express the published LOCKR system ourselves, with IgG1-Fc as our target, to ensure that our workflow of expression, purification, and luminescence measurement is successful. Thus, we can attribute the differences between the experiments to the shifting experimental variables rather than a mishap in our experimental design.</p>
+
+</div></section><section class="wiki-section toc-section" id="materials-and-methods">
+            <h3><span class="chapter-number" aria-hidden="true">02</span><span>Materials  and Methods</span></h3>
+            
+          <div class="section-block">
+  <h4 class="section-block-label">Bacterial Strains</h4>
+<p>Plasmid transformations were done with the use of BL21-DE3(F– ompT hsdSB (rB–, mB–) gal dcm (DE3)) cells, using these cells to allow for high levels of recombinant protein expression driven by the T7 promoter found in the genome. The cage component, contains a kanamycin resistance, and is is encoded on the pET28a vector (ColE1-type origin), while the Key component, contains a chloramphenicol, is encoded on the pACYCDuet vector (p15A origin). The compatibility between these two vectors allows for co-expression of both proteins within one cell. </p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Plasmid Constructs</h4>
+<p>Every LucCage protein CDS was cloned into a pET-28a(+) expression vector containing a T7 promoter, lac operator, ColE1 origin of replication, kanamycin resistance marker, and was tagged with a 6-Histidine tag at the N-Terminal. Similarly, every LucKey protein CDS was cloned into MCS1 of the pACYC-duet expression vector downstream of the T7 promoter, lac operator, chloramphenicol resistance marker, and ribosome-binding site. For testing we made two different types of LucKey, one containing a 6-Histidine tag at the N-Terminal and one with no tag. We used Benchling’s codon optimization tool for all sequences, during this we also screened for the illegal iGEM restriction sites provided on the RFC10 standards. We used the Novagen standard cut sites (NcoI and HindIII) for cloning since we used a pET vector and a duet vector for coexpression. </p>
+<p>The resulting plasmids were transformed into E. coli BL21(DE3) cells, which served as the expression organism for the recombinant LucCage and LucKey protein production. Transformed cells were selected using the appropriate resistance markers.</p>
+<p><strong>Original PfLB-1</strong>: LISDAELEAIFAEELDC (Net Charge: -6)<br><strong>Charge-Optimized PfLB-1</strong>: LISAAALAAIFAAALAC (Net Charge: 0)</p>
+
+</div></section><section class="wiki-section toc-section" id="existing-lockr-pipeline"><h3>Existing LOCKR Pipeline</h3><div class="section-block">
+  <h4 class="section-block-label">Plasmid Design Process</h4>
+<p>The first step in developing the process was deciding which LOCKR sequences to use in our wet-lab experiments. The Tagged Key, Tagged Cage, and Untagged Key were obtained as amino acid sequences. Each sequence was converted to a FASTA file and imported into Benchling as an AA sequence. We used the iGEM RFC10 standards to determine what could and could not be included in the plasmid, and based on this, restriction sites EcoRI, XbaI, SpeI, NotI, and PstI were added as cut sites that we should avoid. Because of this, the optimized sequence would contain any of the banned restriction sites. The full sequence was then back translated with settings where Escherichia coli (O157:H7 EDL933) was the target organism, GC content was set to medium (0.33 to 0.66), and the method was set to “use best codon.” We chose E. coli as our expression organism because we would be transforming in BL21 DE3 cells, a specialized form of E. coli cells engineered for high level production of recombinant proteins. Setting the GC content to medium places it in the standard range of about 40% to 60%. By doing this it focuses on the structural stability of the protein as well as replication efficiency once it has been delivered into the bacterial host. The “using best codon” setting makes it so that every amino acid is replaced with the abundant one that can be found in the host. By doing this, translational efficiency will be at its highest, thus allowing for the most amount of the protein to be expressed. However there is one trade off with doing this: it does not account for possible folding errors. Since we replace every rare amino acid with a more common one, the likehood of repeats, which can lead to more errors in the folding of the protein due to interactions between varying amino acids, increases.</p>
+<p>Our mentors recommended that we use the pET-28a and pACYCDuet-1 vectors for co-expression, and to further understand why they recommended these we performed our own research on vectors. We learned that the pET28a vector places the gene insert under a T7 promoter, which gives tightly regulated, high level expression in E coli strains, specifically the BL21 DE3 cells we planned on using. pACYCDuet-1 has two multiple cloning sites and both of them are under their own T7 promoter meaning we can express two plasmids in the same vector. However this was not the best thing we found. Our original plan was to express the plasmids in two separate vectors and then perform co-expression between them. This would only work if both vectors had the same origin of replication and different resistances. Both of these vectors contained a ColE1-type origin of replication and genes conferring resistance to kanamycin and chloramphenicol. After finalizing the vectors, we pulled their sequences from the AddGene database and added them to Benchling with MCS turned on. We used the Novagen standard cut sites (NcoI and HindIII) for cloning since they only occurred once in both vectors and did not interfere with any components.</p>
+<p>Flanking sequences were added to each optimized LOCKR gene so that the end of the sequences matched the chosen sites in the vectors. The flanking regions would vary depending on what the LOCKR sequence started with. For example, in the His-Tev-SpaC_351_2S it does not contain any part of the NcoI sequence, so for the flanking region you would add the entire sequence (CCATGG). In the His-Tev-LucKey, however, it starts with ATGG, which is the ending sequence of NcoI. Here, you would add CC as the flanking region to form the NcoI cut site. For the flanking region at the end of the sequence it will always be the same starting sequence with a stop codon and then a linking amino acid followed by the cut sequence of the restriction site that is being used (TGAT + AAGCTT). It is important to confirm that the insert stays in frame with the vector’s start codon and any tags. Using Benchling’s Assembly Wizard (“Digest and Ligate”), define the backbone by selecting the two restriction sites (NcoI and HindIII), inverting the selection, and setting it from selection. The insert was then defined using the same two sites we added as the flanking regions. Once Benchling confirms that the ends are compatible, correctly oriented, and without enzyme conflicts, we send it to our mentors to look over. After they give us confirmation that it looks correct, we send it to Genescript as a DNA or amino acid sequence to eventually receive it as liquid DNA.</p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Transformation</h4>
+<p>After designing our plasmids, we sent the sequences to Genscript and they sent us the constructs. We stored them in a -80 degree freezer. The goal of transformation is to get the plasmid DNA into E. coli cells so the cells can copy it and express the protein. The competent BL21 DE3 cells have been treated to their membranes will uptake DNA easier than regular cells. But this means that they are more fragile and should be kept on ice to avoid a drop in transformation efficiency and an increase in cell lysis/death. The plasmid is mixed with a sample of thawed cells and incubated on ice so the DNA can sit against the cell surface. The cells are then heat shocked at 42°C. This sudden change in temperature makes the cell membrane temporarily permeable so the DNA can enter, and an immediate return to the ice closes the cell membrane before any damage can be done to the cells. If you were to heat shock for too long it would kill the cells, and too short doesn’t allow enough DNA to enter the cell.</p>
+<p>Next, the cells are given SOC media and incubated for 1 hour at 37°C. SOC is a nutrient-rich medium that helps cells that were just heat shocked recover quickly. This step is done in the absence of an antibiotic, because the cells need time to repair their membrane before expressing the plasmid gene. After recovery, we used a spreader to spread 75-100ul of the transformed culture to an agar plate that is the selective resistance for the plasmid we transformed. This volume is large enough to give a good number of colonies, but still small enough that the colonies are spread out. Only cells that took up the plasmid can grow on the plate, since the cells that did not take up the plasmid containing the antibiotic resistance gene would be killed by the antibiotic. The plates are then incubated for 1-2 days at 37°C until we see an adequate amount of colonies on the plate to proceed with inoculation.  Often, when we did not see any growth on our plates after the 1-2 day time period, we would spin down the culture and discard a large portion of the supernatant. By doing this we are left with a smaller volume of culture containing a more concentrated cell suspension, which we resuspended and plated again. Because the same number of cells is in a smaller volume, more cells are on the plate, which increases the likelihood of colonies growing. </p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Expression and Induction</h4>
+<p>Once the plates had a sufficient amount of well separated colonies, we used them to inoculate liquid cultures. Using a sterile inoculation loop we picked a single isolated colony and dropped the tip into a 10 mL tube containing 5 mL of LB broth. After we could confirm the colony was off the loop and in the broth, we added 5 uL of the antibiotic stock that matches the plate we took the colony from. Keeping the selective pressure on the culture prevents cells from losing the plasmid, since maintaining it is a metabolic burden and plasmid free cells would otherwise outgrow the transformed ones. The cultures are then incubated in a shaking incubator at 250 rpm for 16 hours. Putting it in a shaking incubator provides the culture with aeration that rapid E. coli growth requires. The resulting starter culture was used to grow a much larger culture with a 1-100 dilution and grew to an OD600 of 0.4-0.6 before induction with IPTG.</p>
+<p>Adding IPTG to our culture would effectively turn on protein production in our cells. The BL21(DE3) cells have a lacUV5 promoter, which is repressed by the LacI repressor and induced by adding IPTG or lactose. IPTG binds similarly to lactose, allowing it to act like an inducer, and has the ability to bind to the LacI repressor and pull it off the DNA. With the lacUV5 promoter repressed, the T7 RNA polymerase gene is not transcribed (other than minimal “leakiness”), since it is located downstream the promoter. This is known as the basal state. If the T7 RNA polymerase gene is transcribed, meaning that IPTG has bound to the LacI repressor and released it, it, exclusively, can induce the T7 promoter. E. coli’s native RNA polymerase does not turn the T7 promoter on.</p>
+<p>With an induced promoter, our target genes can be expressed because our plasmids have placed the LOCKR genes downstream the T7 promoter. This is the change from the basal state, where there is no IPTG, to an induced state, where IPTG is present. The induced state heavily produces the target protein since the polymerase commits the cell’s ribosomes to our transcript. </p>
+<p>The cultures are induced when they are at the mid-log phase, meaning that the OD600 is around 0.5. This is the point where the cell density is high enough to yield a usable amount of target protein, but the cells are still dividing fast. If the culture is induced too early, there will be too little biomass. If it is induced too late (when cell density levels off), the output per cell is too low.</p>
+<p>Directly after IPTG is added, the culture is put in a shaking incubator at 22 °C rather than 37 °C because at 37 °C, the peptides would leave the ribosomes before they can fold. Our Cage is a six-helix protein whose hydrophobic faces have to be arranged in a certain order, in a certain way. If the hydrophobic faces are left exposed, meaning that the protein doesn’t fold, the surfaces interact and the protein precipitates. These are absent from the soluble fraction and present in the total lysate. Because of this, the protein needs to fold within the ribosome to be effective, which is possible at 22 °C. </p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Harvest and Normalization</h4>
+<p>After incubating the culture overnight, we centrifuged the culture to collect the cells in the pellet. We discarded the supernatant. We then stored the pellets at -80 °C which is a temperature that can both preserve the cells but also weaken the cell envelope enough to make lysis easier.</p>
+<p>Normalizing the OD600 is important because adding samples into lanes depends on the culture volume and equal OD600 will not indicate equal cell material until the values are normalized. For example, a culture with an OD600 of 0.5 in a 100mL has the same amount of cells as a 50mL culture with an OD600 of 1.0. We normalize these values by calculating the UOD600, which is the OD600 multiplied by the culture volume, and this gives us the total cell mass.</p>
+<p>As mentioned, cultures with the same OD600 could have different amounts of cells, so if we go off of this value, the band intensity would just reflect the amount of cells in the lane rather than the amount of protein each cell produced. Without this you would not be able to compare lanes. An OD per mL value, which is the UOD600, acts as a common reference point, so the loading volume inserts the same amount of cells in each lane. The volume of PBS and resuspension volumes are then calculated for each construct.</p>
+<p>Centrifugation conditions are dependent on culture volume. We used 13,000 rpm for 1.5 mL tubes when our culture volume was small, but with our 50 mL tubes we centrifuged at 5,000 x g. This gentler rpm for higher volumes creates a looser, more resuspendable pellet.</p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Gel 1 (Expression Check)</h4>
+<p>This gel tells us whether the construct expressed at all. We only ran the post-induction soluble lysate in the expression gel for each construct. If there was a band at the expected molecular weight, it means that there was expression. The soluble lysate tells us not only whether the protein was produced but also if it folded correctly and stayed in the solution.</p>
+<p>We had an Actin and Myosin control which gave us a size reference (letting us estimate the size of our own constructs) and allowed us to compare against known protein masses. For our constructs, we needed to run the gel at 150 V for 30 minutes.</p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Lysis and Fractionation</h4>
+<p>The goal of lysis reagent or lysis buffer is to break open the cell membranes and walls to release the internal cellular components. Adding the reagent releases proteases, which degrade the target proteins when they interact with them. Therefore, if we don’t add protease inhibitors, much of the target protein would be degraded before we could purify it. For this reason, it is important to add protease inhibitors at the same time as the lysis reagent. The buffer is added at a 5:1 scale to pellet mass, with a lower than needed volume leading to a viscous lysate that is difficult to clarify.</p>
+<p>Then, the lysate is centrifuged to separate the insoluble pellet (cell material) and soluble fraction (which contain the proteins), which are eventually run. The pellet is resuspended in a volume of PBS equal to the volume of the supernatant. The equal amount of PBS makes the fractions comparable on a gel because the band intensities reflect the amount of protein that folded correctly rather than the proportion that formed inclusion bodies. </p>
+<p>A strong band for the insoluble fraction and a weak one for the soluble fraction indicates that protein was produced but it wasn’t folded correctly. This likely means that there was a problem with the induction temperature.</p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Protein Purification</h4>
+<p>Our tagged proteins are separated from the other proteins through Immobilized Metal Affinity Chromatography (IMAC), which is how Ni-NTA beads work. The His-tags on the tagged proteins have histidine residues on them, and these have imidazole rings. The imidazole rings have electron rich nitrogen atoms in them which have a strong affinity for the Ni2+ beads, so when the His-tagged proteins interact with the beads, they are essentially locked to them. The His-tagged proteins are not the only elements present in the soluble lysate, however, so the contaminants need to be filtered out. We use wash buffers to remove these contaminants, and the wash buffer works through imidazole, which competes against the histidine residues for nickel coordination sites on the resin. If imidazole is present at a high concentration in the wash buffer, it would outcompete the His-tags and cause even the tagged proteins to be released from the resin. Low concentrations are optimal, so only the weakly bounded contaminants are steadily removed with every wash, keeping the target proteins still bound.</p>
+<p>We put the tubes on a rotating rack and allow the target to bind to the Ni-NTA resin. While it’s incubating on the rack, the rotation keeps the resin suspended so the lysate is in contact with the beads throughout. </p>
+<p>The Untagged Key serves as a control because it has no His-Tag. Thus, we expect it to only be in the flowthrough fraction. Untagged protein that we find in the elution sets a baseline for how effective the purification can be because it is a result of non-specific binding. Contamination will be present to some extent regardless of the number of washes we perform, so it is important to know this baseline.</p>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Gel 2 (Purification Check)</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Checking the Luminescence Response</h4>
+<p>There are two fragments that make up NanoBiT, the LgBiT and the SmBiT. When these two fragments complement each other and furimazine, the substrate, is present, the system will produce light. SmBiT is integrated into the Cage's latch and LgBiT is fused into the Key. When it is in its closed state, the latch is held against the Cage's helical bundle, sequestering the SmBiT. The latch needs to be released for SmBiT to be exposed and thus for the Key to dock. Typically, the latch only displaces in the presence of the target, and then the Key can bind, the fragments complement, and the reconstituted enzyme converts furimazine to produce light. There will be background luminescence though, because of the Cage's leakiness. The latch may open even without the presence of the target PfLDH, especially considering how it is made to be weakly bound to the Cage so it can release when the target binds to the binder.</p>
+<p>We will measure fold-change, which is the signal in the presence of the target divided by the signal when the target is absent. Absolute luminescence cannot be compared between runs because it is dependent on substrate age, protein concentration, and reader settings. The ratio, however, can be compared. We measured readings with and without IgG-Fc, a model target used to validate the switch architecture before swapping in a disease specific binder and target such as PfLDH, so we know the target can trigger a substantial increase in luminescence. The Cage–Key affinities and relative concentrations of Key and target determine the achievable dynamic range.</p>
+
+</div></section><section class="wiki-section toc-section" id="modified-binder-experimentation">
+            <h3><span class="chapter-number" aria-hidden="true">04</span><span>Modified Binder Experimentation</span></h3>
+            
+          <div class="section-block">
+  <h4 class="section-block-label">Expression and Purification</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Gel Analysis</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">SPR Analysis</h4>
+
+</div></section><section class="wiki-section toc-section" id="mcshan-lab"><h3>McShan Lab</h3><div class="section-block"></div></section><section class="wiki-section toc-section" id="genscript"><h3>GenScript</h3><div class="section-block"></div></section><section class="wiki-section toc-section" id="references-3"><h3>References</h3><div class="section-block"></div></section></div>
+      </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">⇧</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    <script src="static/wiki-toc.js?v=4f67627731d9"></script>
+      <script src="static/carousel.js"></script>
+  
+
+
+</body></html>

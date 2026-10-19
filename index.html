@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Denmark-GA — iGEM 2026</title>
+    <base href="./" />
+    <link rel="stylesheet" href="static/style.css" />
+    <link rel="stylesheet" href="static/denmark.css" />
+    <link rel="stylesheet" href="static/home-v2.css?v=51" />
+  </head>
+  <body>
+    <div id="nav"></div>
+
+    <main class="hv">
+      <section class="hv-hero" id="top" aria-label="Eclipse">
+        <h1 class="hv-sr">Eclipse</h1>
+        <img src="static/home/eclipse-hero.webp" srcset="static/home/eclipse-hero-small.webp 1000w, static/home/eclipse-hero.webp 1672w" sizes="100vw" alt="Eclipse: a blue cloud-shaped peptide mascot floats above a lab bench with a microscope, a keyboard and a mosquito" width="1672" height="941" fetchpriority="high" />
+        <img src="https://static.igem.wiki/teams/6112/wiki/animations/titleanimation.webp" alt="" aria-hidden="true" id="hero-intro-anim" class="home-hero-intro" />
+      </section>
+
+      <section class="hv-story" id="peptide" aria-label="Why peptide binders are hard to make, and why we chose malaria">
+        <div class="hv-pin">
+          <div class="hv-bg" aria-hidden="true"><div class="hv-dec" data-dec="story"></div><svg width="100%" height="100%"><defs><pattern id="hv-hex" width="104" height="180" patternUnits="userSpaceOnUse" patternTransform="scale(.62)"><path d="M52 0 L104 30 L104 90 L52 120 L0 90 L0 30 Z M52 120 L52 180 M0 90 L0 150 L52 180 L104 150 L104 90" fill="none" stroke="#2f6fb0" stroke-width="1.4"/></pattern></defs><rect width="100%" height="100%" fill="url(#hv-hex)"/></svg>
+          </div>
+          <canvas class="hv-canvas" role="img" aria-label="A peptide, drawn as a yellow chain of beads, sitting on the malaria enzyme PfLDH. The enzyme fades, the peptide drifts to the middle, and four lines run from it to notes about why today&rsquo;s tools fall short."></canvas>
+          <h2 class="hv-say"><span>Creating effective,</span><span>accurate, and specific</span><span>peptide binders</span><span><em>is hard.</em><img class="hv-sad" src="static/home/mascot-sad.webp" alt="" width="420" height="273" decoding="async" /></span></h2>
+
+          <svg class="hv-lines" aria-hidden="true"><g><line></line><circle r="5"></circle></g><g><line></line><circle r="5"></circle></g><g><line></line><circle r="5"></circle></g><g><line></line><circle r="5"></circle></g></svg>
+
+          <div class="hv-notes">
+            <article class="hv-note" data-side="l" data-edge="top" tabindex="0" role="group" aria-labelledby="hv-n1">
+              <h2 id="hv-n1">Inaccurate</h2>
+              <p class="sum"><b class="n">39%</b>is how often the best docking tool ranked the right fit first, across 133 protein&ndash;peptide pairs.</p>
+              <div class="more"><div><div class="more-in">
+                <dl>
+                  <div class="row"><dt>52%</dt><dd>PIPER-FlexPepDock puts a pose within 2 &Aring; of the real one in its top 10 answers.</dd></div>
+                  <div class="row"><dt>59%</dt><dd>of 112 peptide complexes were modelled acceptably by AlphaFold-Multimer.</dd></div>
+                  <div class="row"><dt>46</dt><dd>flexible bonds in a 12-residue peptide. Docking tools struggle past about 10.</dd></div>
+                </dl>
+                <p class="src">Sources: <a href="https://doi.org/10.1186/s12859-018-2449-y" target="_blank" rel="noopener">Agrawal et al. 2019</a>, <a href="https://doi.org/10.1002/jcc.70328" target="_blank" rel="noopener">Martins et al. 2026</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9580857/" target="_blank" rel="noopener">Johansson-&Aring;khe &amp; Wallner 2022</a></p>
+              </div></div></div>
+            </article>
+
+            <article class="hv-note" data-side="r" data-edge="top" tabindex="0" role="group" aria-labelledby="hv-n2">
+              <h2 id="hv-n2">Slow</h2>
+              <p class="sum"><b class="n">48 h</b>of GPU time to score one binder with physics (FEP). Just docking it takes half an hour.</p>
+              <div class="more"><div><div class="more-in">
+                <dl>
+                  <div class="row"><dt>29.8 min</dt><dd>per peptide on HPEPDOCK, a docking web server. ZDOCK takes 11.5.</dd></div>
+                  <div class="row"><dt>~3 weeks</dt><dd>to check 1,000 candidates one after another (our arithmetic: 1,000 &times; 29.8 min).</dd></div>
+                  <div class="row"><dt>48 h</dt><dd>of A100 GPU time to score one binder with physics (FEP). A design run needs thousands.</dd></div>
+                </dl>
+                <p class="src">Sources: <a href="https://doi.org/10.1002/jcc.70328" target="_blank" rel="noopener">Martins et al. 2026</a>, <a href="https://doi.org/10.1021/acsomega.5c00151" target="_blank" rel="noopener">Chen &amp; Yang 2025</a></p>
+              </div></div></div>
+            </article>
+
+            <article class="hv-note" data-side="l" data-edge="bottom" tabindex="0" role="group" aria-labelledby="hv-n3">
+              <h2 id="hv-n3">Expensive</h2>
+              <p class="sum"><b class="n">&lt;1%</b>of computer-designed binders work in the lab, and the leading design tool wants a 32&nbsp;GB GPU.</p>
+              <div class="more"><div><div class="more-in">
+                <dl>
+                  <div class="row"><dt>32 GB</dt><dd>of GPU memory recommended for BindCraft, a leading design tool. A typical laptop has no NVIDIA GPU and about 16 GB.</dd></div>
+                  <div class="row"><dt>&lt;1%</dt><dd>of computer-designed binders worked in the lab. Hard targets can take thousands of trials.</dd></div>
+                  <div class="row"><dt>$2.6B</dt><dd>to bring one drug to market, for scale.</dd></div>
+                </dl>
+                <p class="src">Sources: <a href="https://github.com/martinpacesa/BindCraft" target="_blank" rel="noopener">BindCraft docs</a>, <a href="https://rosettacommons.org/2025/09/25/one-shot-design-of-functional-protein-binders-with-bindcraft/" target="_blank" rel="noopener">Pacesa 2025</a>, <a href="https://ideas.repec.org/a/eee/jhecon/v47y2016icp20-33.html" target="_blank" rel="noopener">DiMasi et al. 2016</a></p>
+              </div></div></div>
+            </article>
+
+            <article class="hv-note" data-side="r" data-edge="bottom" tabindex="0" role="group" aria-labelledby="hv-n4">
+              <h2 id="hv-n4">Hard to use</h2>
+              <p class="sum"><b class="n">5.5 &Aring;</b>FlexPepDock only works if you start that close to the answer. You need the answer to get the answer.</p>
+              <div class="more"><div><div class="more-in">
+                <ul>
+                  <li><b>AlphaFold-Multimer</b> only says whether a peptide binds. Its scores (pLDDT, PAE, ipTM) take structural-modelling expertise to read.</li>
+                  <li><b>HADDOCK 2.4</b> gives a binding score, but is much slower, and works about 45% of the time even when the binding region is roughly known.</li>
+                  <li><b>FlexPepDock</b> needs a starting model that is already close to the answer (within 5.5 &Aring;).</li>
+                </ul>
+                <p class="src">Sources: <a href="pages/description.html">our Description page</a>, <a href="https://doi.org/10.1093/nar/gkr431" target="_blank" rel="noopener">London et al. 2011</a></p>
+              </div></div></div>
+            </article>
+          </div>
+          <div class="hv-cost">
+            <canvas class="hv-cost-globe" aria-hidden="true"></canvas>
+            <canvas class="hv-cost-fx" aria-hidden="true"></canvas>
+            <div class="hv-cost-card">
+              <h2>Making a new drug is slow and costly.</h2>
+              <p class="big"><b class="n">$2.6B</b><span>to bring one drug to market</span></p>
+              <p class="more">Even one binder for LOCKR takes big GPUs and months of lab work, because design software can&rsquo;t yet tell which candidates will work.</p>
+              <p class="src"><b>Source</b><a href="https://ideas.repec.org/a/eee/jhecon/v47y2016icp20-33.html" target="_blank" rel="noopener">DiMasi, Grabowski &amp; Hansen 2016</a></p>
+            </div>
+          </div>
+          <div class="hv-intro" aria-hidden="true"><small class="hv-intro-tag">Our application</small><h2><span>We faced this problem with</span> <em><i>M</i><i>A</i><i>L</i><i>A</i><i>R</i><i>I</i><i>A</i></em></h2><p>Most rapid tests look for HRP2, made by a gene the parasite can delete. About 2 in 10 cases go undiagnosed, a gap the WHO has formally acknowledged.</p><img class="hv-intro-pal" src="static/home/mascot.webp" alt="" width="420" height="273" decoding="async" loading="lazy" /></div>
+
+          <div class="hv-lens" role="img" aria-label="A microscope view of blood cells with a pie chart on it: 15% of malaria parasites have deleted the HRP2 gene. It rolls to the right and turns into a globe showing where malaria is found.">
+            <div class="hv-disc">
+              <img class="hv-mal-pic" src="static/home/malaria-lens.webp" alt="" width="690" height="690" decoding="async" />
+              <svg class="hv-pie" viewBox="-54 -54 108 108" aria-hidden="true" focusable="false"><circle class="ring" r="52"></circle><circle class="slice s-ok" r="25" stroke-dasharray="133.52 157.08"></circle><circle class="slice s-del" r="25" stroke-dasharray="23.56 157.08" stroke-dashoffset="-133.52"></circle></svg>
+              <span class="hv-pie-lbl" aria-hidden="true">15%</span>
+            </div>
+            <canvas class="hv-globe" aria-hidden="true"></canvas>
+          </div>
+          <div class="hv-shadow" aria-hidden="true"></div>
+
+          <div class="hv-mal">
+            <span class="hv-pct"><b data-v="15">15</b><small>%</small></span>
+            <h2>of malaria parasites have deleted HRP2, the protein most rapid tests look for.</h2>
+            <p>Those tests then read negative in people who are sick. So we switched to PfLDH, an enzyme the parasite can&rsquo;t live without.</p>
+            <p class="src"><!-- TODO: the 15% needs its citation; neither the Colombian paper nor the WHO MPAG statement below states it --> Background: <a href="https://www.who.int/news/item/28-05-2021-statement-by-the-malaria-policy-advisory-group-on-the-urgent-need-to-address-the-high-prevalence-of-pfhrp2-3-gene-deletions-in-the-horn-of-africa-and-beyond" target="_blank" rel="noopener">WHO on pfhrp2/3 deletions &#8599;</a> <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12165712/" target="_blank" rel="noopener">Colombian study &#8599;</a></p>
+          </div>
+
+          <div class="hv-world">
+            <div class="hv-stat"><b class="hv-big" data-v="282">282<small>M</small></b><p>malaria cases in 2024.</p></div>
+            <div class="hv-stat"><b class="hv-big hv-big--del" data-v="42">42<small>M</small></b><p>of those cases, if 15% have deleted HRP2 (15% &times; 282M). Common tests miss them.</p></div>
+            <p class="src"><a href="https://www.who.int/news-room/fact-sheets/detail/malaria" target="_blank" rel="noopener">Cases: WHO &#8599;</a> <a href="https://www.who.int/news/item/28-05-2021-statement-by-the-malaria-policy-advisory-group-on-the-urgent-need-to-address-the-high-prevalence-of-pfhrp2-3-gene-deletions-in-the-horn-of-africa-and-beyond" target="_blank" rel="noopener">HRP2: WHO &#8599;</a></p>
+            <p class="key"><i class="f"></i>P. falciparum <i class="v"></i>P. vivax</p>
+          </div>
+
+          <div class="hv-dark" aria-hidden="true"></div>
+
+          <div class="hv-ec">
+            <div class="hv-ec-intro">
+              <p class="hv-ec-lead">With these problems in hand, we created</p>
+              <h2 class="hv-ec-word" aria-label="ECLIPSE: Evaporatively Cooled LOCKR-Integrated Peptide Screening and Evaluation"><span class="w"><span class="i">E</span><span class="r">vaporatively </span></span><span class="w"><span class="i">C</span><span class="r">ooled </span></span><span class="w"><span class="i">L</span><span class="r">OCKR-</span></span><span class="w"><span class="i">I</span><span class="r">ntegrated </span></span><span class="w"><span class="i">P</span><span class="r">eptide </span></span><span class="w"><span class="i">S</span><span class="r">creening </span></span><span class="r">and </span><span class="w"><span class="i">E</span><span class="r">valuation</span></span></h2>
+              <img class="hv-ec-mascot" src="static/home/mascot.webp" alt="" width="420" height="273" decoding="async" loading="lazy" />
+            </div>
+            <div class="hv-ec-rail" aria-hidden="true"><i class="fill"></i><img class="hv-ec-pal" src="static/home/mascot.webp" alt="" width="420" height="273" decoding="async" loading="lazy" /></div>
+            <div class="hv-ec-node" data-i="0"><i></i><span>HybriDock-Pep</span></div>
+            <div class="hv-ec-node" data-i="1"><i></i><span>LATTE</span></div>
+            <div class="hv-ec-node" data-i="2"><i></i><span>LOCKR</span></div>
+
+            <section class="hv-ec-panel" data-i="0" aria-label="HybriDock-Pep">
+              <div class="txt">
+                <p class="eb">Step 1 of 3</p>
+                <h2><span>HybriDock-</span><span>Pep</span></h2>
+                <p class="one">Predicts how tightly a peptide grips its target, on a laptop.</p>
+                                <p class="chips"><span><b>&plusmn;1.64</b> kcal/mol error</span><span><b>7:40</b> for 100 poses</span><span><b>0</b> GPUs</span></p>
+                <figure class="w-sel" aria-label="The same peptide docked to malaria LDH and to human LDH, ten best poses each: it grips the malaria enzyme 0.97 kcal/mol tighter on average.">
+                  <figcaption>Same peptide, two proteins</figcaption>
+                  <div class="lane" data-k="t"><span class="nm">Malaria LDH</span><div class="tr"></div></div>
+                  <div class="lane" data-k="o"><span class="nm">Human LDH</span><div class="tr"></div></div>
+                  <div class="ax"><span>&minus;9</span><span>&minus;8</span><span>&minus;7</span><span>&minus;6 kcal/mol</span></div>
+                  <p class="res">It grips the parasite enzyme <b>0.97</b> kcal/mol tighter.</p>
+                </figure>
+                <a class="pill" href="pages/HybriDock-Pep.html">How it works &rarr;</a>
+              </div>
+              <div class="hv-an" id="hv-an0"><div class="lensd"><canvas aria-hidden="true"></canvas></div></div>
+            </section>
+
+            <section class="hv-ec-panel" data-i="1" aria-label="LATTE">
+              <div class="txt">
+                <p class="eb">Step 2 of 3</p>
+                <h2><span>LATTE</span></h2>
+                <p class="one">Grafts the binder into every spot on the latch and scores each one.</p>
+                <div class="stat"><b class="n">0</b><span>of 40 latch positions scored. The lowest score wins.</span></div>
+                <figure class="w-bars" aria-label="Score of the binder at each of 40 latch positions; the lowest wins. Illustration.">
+                  <div class="bars"></div>
+                  <figcaption><span>Score per latch position (lower is better)</span><b class="best"></b></figcaption>
+                </figure>
+                <p class="chips"><span>&rarr; fold-change</span><span>&larr; LucKey dose</span><span>&deg;C working window</span></p>
+                <a class="pill" href="pages/LATTE.html">How it works &rarr;</a>
+              </div>
+              <div class="hv-an" id="hv-an1"><div class="lensd"><canvas aria-hidden="true"></canvas></div><span class="sc">Illustration, not measured data</span></div>
+            </section>
+
+            <section class="hv-ec-panel" data-i="2" aria-label="LOCKR opening">
+              <div class="txt">
+                <p class="eb">Step 3 of 3</p>
+                <h2><span>LOCKR</span></h2>
+                <p class="one">PfLDH opens the latch. LucKey clips on, and with furimazine it glows.</p>
+                <figure class="w-seq" aria-label="PfLB-1, our binder for PfLDH: LISDAELEAIFAEELDC. Best of 9 designs, minus 7.3 kcal/mol predicted.">
+                  <figcaption><b>PfLB-1</b> on the latch &middot; best of 9 designs &middot; <b class="r">&minus;7.3</b> kcal/mol</figcaption>
+                  <div class="tiles"></div>
+                  <p class="key"><i class="g"></i>greasy <i class="c"></i>charged</p>
+                </figure>
+                <ol class="steps"><li>Cage</li><li>PfLDH docks</li><li>Latch opens</li><li>LucKey clips on</li><li>Glow</li></ol>
+                <a class="pill" href="pages/wetlab.html">Wet lab &rarr;</a>
+              </div>
+              <div class="hv-an hv-an--night" id="hv-an2"><div class="lensd"><canvas aria-hidden="true"></canvas></div><span class="sc">Illustration, not measured data</span></div>
+            </section>
+
+        </div>
+      </section>
+
+      <section class="hv-dx" id="diagnostic" aria-label="The malaria test: LOCKR and the coffee-ring assay">
+        <div class="dx-pin">
+          <div class="hv-dec" data-dec="dx" aria-hidden="true"></div>
+          <p class="dx-open"><span>The test itself</span>Two ideas make one malaria test.</p>
+          <div class="dx-disc" role="img" aria-label="An animation of a LOCKR cage opening and glowing, which then turns into an animation of a drying droplet pushing glowing particles into a ring.">
+            <img class="dx-a" src="https://static.igem.wiki/teams/6112/wiki/animations/lockranim.webp" alt="" width="800" height="800" decoding="async" />
+            <img class="dx-b" src="https://static.igem.wiki/teams/6112/wiki/animations/coffeering.webp" alt="" width="800" height="800" decoding="async" loading="lazy" />
+          </div>
+          <div class="dx-shadow" aria-hidden="true"></div>
+          <div class="dx-t" data-i="0">
+            <p class="dx-eb">Idea 1</p>
+            <h2>LOCKR</h2>
+            <p>A protein cage that glows when it meets PfLDH. The enzyme opens the latch, a split luciferase snaps together, and with furimazine it makes light.</p>
+            <a class="dx-pill" href="pages/description.html">How it works &rarr;</a>
+          </div>
+          <div class="dx-t" data-i="1">
+            <p class="dx-eb">Idea 2</p>
+            <h2>Coffee-ring assay</h2>
+            <p>As a droplet of sample dries, the flow inside carries the glowing cages to its edge and stacks them into a bright ring you can see by eye.</p>
+            <a class="dx-pill" href="pages/description.html">How it works &rarr;</a>
+          </div>
+          <ol class="dx-flow"><li>PfLDH in the sample</li><li>LOCKR lights up</li><li>The droplet dries to a ring</li><li>You can see it</li></ol>
+        </div>
+      </section>
+
+      <section class="hv-next" aria-labelledby="hv-next-t">
+        <div class="hv-dec" data-dec="next" aria-hidden="true"></div>
+        <p class="hv-next-eb" data-rise>Future steps</p>
+        <h2 id="hv-next-t" data-rise>Malaria is the first target, <em>not the last.</em></h2>
+        <p class="hv-next-p" data-rise>This pipeline works for any disease. Design peptides with de novo design software, then test them with HybriDock-Pep to find the best one. Use LATTE to scan and optimise the binder for grafting into LOCKR, and to predict how much LucKey gives a target signal, all before ordering anything.</p>
+        <p class="hv-next-go" data-rise><a href="pages/HybriDock-Pep.html">HybriDock-Pep &rarr;</a><a href="pages/LATTE.html">LATTE &rarr;</a></p>
+      </section>
+      <section class="hv-go" aria-labelledby="hv-go-t">
+        <div class="hv-dec" data-dec="go" aria-hidden="true"></div>
+        <div class="go-head" data-rise>
+          <img class="go-pal" src="static/home/mascot-lockr.webp" alt="" width="800" height="643" loading="lazy" />
+          <h2 id="hv-go-t">Explore ECLIPSE.</h2>
+          <p>The software, the test and the people behind it.</p>
+        </div>
+        <div class="go-grid">
+          <a class="go-card c1" href="pages/description.html" data-rise><small>Start here</small><h3>Our project</h3><p>The problem, our approach, and how the pieces fit together.</p><i aria-hidden="true">&#8599;</i></a>
+          <a class="go-card c2" href="pages/HybriDock-Pep.html" data-rise><small>Software</small><h3>HybriDock-Pep</h3><p>How tightly a peptide holds its target, in minutes on a laptop.</p><img src="static/home/peptide-a.webp" alt="" width="270" height="160" loading="lazy" /><i aria-hidden="true">&#8599;</i></a>
+          <a class="go-card c3" href="pages/LATTE.html" data-rise><small>Software</small><h3>LATTE</h3><p>Where the binder goes on the LOCKR latch, and how bright it will glow.</p><img src="static/home/lockr-cartoon.webp" alt="" width="211" height="420" loading="lazy" /><i aria-hidden="true">&#8599;</i></a>
+          <a class="go-card c4" href="pages/wetlab.html" data-rise><small>Wet lab</small><h3>Experiments</h3><p>Building and testing the LOCKR malaria sensor at the bench.</p><img src="static/home/mascot-microscope.webp" alt="" width="1039" height="770" loading="lazy" /><i aria-hidden="true">&#8599;</i></a>
+          <a class="go-card c5" href="pages/model.html" data-rise><small>Dry lab</small><h3>Model</h3><p>How a drying droplet pushes the glow into a ring.</p><i aria-hidden="true">&#8599;</i></a>
+          <a class="go-card c6" href="pages/human-practices.html" data-rise><small>Human practices</small><h3>Out in the world</h3><p>The people we talked to and what changed because of them.</p><img src="static/home/mascot.webp" alt="" width="420" height="273" loading="lazy" /><i aria-hidden="true">&#8599;</i></a>
+        </div>
+        <p class="go-more" data-rise><a href="pages/results.html">Results</a><a href="pages/parts.html">Parts</a><a href="pages/engineering.html">Engineering</a><a href="pages/hardware.html">Hardware</a><a href="pages/binder-viewer.html">Binder viewer</a><a href="pages/education.html">Education</a><a href="pages/safety.html">Safety</a><a href="pages/team.html">Team</a></p>
+      </section>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">&#8679;</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/hero-intro.js?v=8" defer></script>
+    <script src="static/include.js?v=11"></script>
+    <script src="static/vendor/three.min.js"></script>
+    <script src="static/lab-globe.js"></script>
+    <script src="static/hybridock-3d.js?v=17"></script>
+    <script src="static/lockr-3d.js?v=20"></script>
+    <script src="static/vendor/gsap.min.js"></script>
+    <script src="static/vendor/ScrollTrigger.min.js"></script>
+    <script src="static/home-attach.js"></script>
+    <script src="static/home-v2-eclipse.js?v=21"></script>
+    <script src="static/home-v2-cost.js?v=1"></script>
+    <script src="static/home-v2.js?v=27"></script>
+    <script src="static/home-v2-dx.js?v=4"></script>
+    <script src="static/home-v2-fx.js?v=6"></script>
+  </body>
+</html>

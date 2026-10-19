@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Binder Viewer — Denmark-GA iGEM 2025</title>
+    <base href="../" />
+    <link rel="stylesheet" href="static/style.css" />
+    <link rel="preload" href="https://static.igem.wiki/teams/6112/wiki/betterfonts/fredoka-regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="https://static.igem.wiki/teams/6112/wiki/betterfonts/varelaround-regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="static/denmark.css" />
+    <link rel="stylesheet" href="static/section-blocks.css" />
+    <link rel="stylesheet" href="static/molstar/molstar.css" />
+    <link rel="stylesheet" href="static/binder-viewer.css" />
+    <link rel="stylesheet" href="static/wiki-pages.css?v=d1ad75dc95bf">
+  </head>
+  <body class="wiki-interior" data-page-family="research">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+    <main>
+      <div class="page-hero">
+        <div class="container"><div class="chapter-intro">
+          <h1>Binder Viewer</h1>
+          <p class="summary draft-summary">--</p>
+        </div></div>
+      </div>
+
+      <div class="page-content">
+        <div class="container binder-page-container">
+
+          <section class="wiki-section" id="viewer">
+            <h3><span class="chapter-number" aria-hidden="true">01</span><span>Interactive Structure Viewer</span></h3>
+            <div class="binder-viewer-layout">
+              <div class="binder-sidebar section-block">
+                <span class="section-block-label">Structures</span>
+                <div id="binder-tabs" class="binder-tabs"></div>
+                <div id="binder-list" class="binder-list"></div>
+                <p id="binder-empty" class="binder-empty-msg" hidden>No structures have been added yet — check back soon.</p>
+              </div>
+              <div class="binder-main">
+                <div id="binder-molstar-app" class="binder-molstar-card"></div>
+                <div id="binder-detail" class="section-block"></div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">&#8679;</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    
+    <script src="static/molstar/molstar.js"></script>
+    <script src="static/binder-viewer.js"></script>
+  </body>
+</html>

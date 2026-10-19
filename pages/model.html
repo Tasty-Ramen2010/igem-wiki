@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Model — Denmark-GA iGEM 2025</title>
+    <base href="../">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="preload" href="https://static.igem.wiki/teams/6112/wiki/betterfonts/fredoka-regular.ttf" as="font" type="font/ttf" crossorigin="">
+    <link rel="preload" href="https://static.igem.wiki/teams/6112/wiki/betterfonts/varelaround-regular.ttf" as="font" type="font/ttf" crossorigin="">
+    <link rel="stylesheet" href="static/denmark.css">
+    <link rel="stylesheet" href="static/section-blocks.css">
+    <link rel="stylesheet" href="static/wiki-pages.css?v=refs4">
+  </head>
+  <body class="wiki-interior" data-page-family="research">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+
+    <main>
+      <div class="page-hero">
+        <div class="container"><div class="chapter-intro">
+          <h1>Model</h1>
+          <p class="summary draft-summary">--</p>
+        </div></div>
+      </div>
+
+      <div class="wiki-reading-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-handle" aria-hidden="true">Table of Contents</div>
+      <nav class="toc-nav" id="toc-links" aria-label="Page sections">
+        <p class="toc-nav-heading">On this page</p>
+        
+        
+        
+        
+      <a href="#binder-creation-pipeline" data-toc="binder-creation-pipeline">Binder Creation Pipeline</a><a href="pages/model.html#hybridock-pep" data-toc="hybridock-pep">HybriDock-Pep</a><a href="pages/model.html#lockr-integration" data-toc="lockr-integration">LOCKR Integration</a><a href="pages/model.html#coffee-ring" data-toc="coffee-ring">Coffee-Ring Assay</a><a href="pages/model.html#references" data-toc="references">References</a></nav>
+    </aside>
+
+      <div class="page-content">
+        <div class="container">
+
+          
+
+          
+
+          
+
+          
+
+
+        <section class="wiki-section toc-section" id="binder-creation-pipeline"><h3>Binder Creation Pipeline</h3><div class="section-block"></div></section><section class="wiki-section toc-section" id="hybridock-pep">
+            <h3><span class="chapter-number" aria-hidden="true">03</span><span>HybriDock-Pep</span></h3>
+
+          <div class="section-block">
+<p>--</p>
+
+</div></section><section class="wiki-section toc-section" id="lockr-integration">
+            <h3><span class="chapter-number" aria-hidden="true">02</span><span>LOCKR Integration</span></h3>
+
+          <div class="section-block">
+<h4>Model Overview</h4>
+<p>The thermodynamic modelling behind ECLIPSE's LOCKR help in determining how effective the design is at detecting PfLDH. LOCKR integration simmers down to PfLDH binding, latch opening, and luminescence into a single kinetic model that can be applied for other diseases and their detections. Our team used the model to collect data on the lowest PfLDH levels needed to produce luminescence, and the levels of lucKey needed to produce a certain fold-change.</p>
+
+</div><div class="section-block">
+<h4>Signaling Pathway</h4>
+<p>In the LucCage variant of LOCKR, the binder is grafted directly onto the latch and in the system's closed state, neither the lucKey nor the target protein bind to the latch. According to the LOCKR appear published by Quijano-Rubio in 2021, the latch has a K_open value of 10<sup>-3</sup>. Upon binding to PfLDH, our target protein, the latch is displaced and opens to unsequester SmBiT luciferase. Because the latch is now held open by the target protein, lucKey (LgBiT) is able to bind to the cage, allowing the LgBiT luciferase to reconstitute with the SmBiT luciferase. This reconstituted luciferase enzyme is called NanoLuc and the amount of light that it creates is proportional to the amount of lucKey-bound cages in the solution. Our thermodynamics documentation instead lets the target also bind to the closed latch, with a pull strength constant that controls latch-tightness. </p>
+
+</div><div class="section-block">
+<h4>Biochemical Reactions</h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Reaction</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>C ⇌ O</td>
+<td>Latch opens and closes with no target (K_open = 10⁻³)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>CT ⇌ OT</td>
+<td>Same with target bound; opening favored (1 + pull)-fold</td>
+</tr>
+<tr>
+<td>3</td>
+<td>C+T ⇌ CT</td>
+<td>Target binds the closed switch</td>
+</tr>
+<tr>
+<td>4</td>
+<td>O+T ⇌ OT</td>
+<td>Target binds the open switch (Kd = K_LT in the paper topology)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>lucKey + switch ⇌ lucKey-bound</td>
+<td>lucKey binds with K_CK = 10 nM (open switch in the paper and reporter topologies, closed switch in the baseline topology)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>lucKey-bound + T ⇌ key-bound, target-bound</td>
+<td>Target binds to a design that already carries lucKey</td>
+</tr>
+</tbody></table>
+<p>In these reactions, C is the closed system, O is the open system, T is the target (PfLDH), and CT and OT are the closed system and open system with the target binded. Key is lucKey</p>
+<p>Reactions 1-4 of the model represent a thermodynamics cycle with k_off = k_on × Kd showing the cycle has balance. Additionally, when lucKey is bound to the cage, the system will not close.</p>
+
+</div><div class="section-block">
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>K_open</td>
+<td>10<sup>-3</sup></td>
+<td>Quijano-Rubio et al. 2021</td>
+</tr>
+<tr>
+<td>K_CK</td>
+<td>10 nM</td>
+<td>Quijano-Rubio et al. 2021</td>
+</tr>
+<tr>
+<td>Binder Kd</td>
+<td>100 pM</td>
+<td>Thermodynamics documentation</td>
+</tr>
+<tr>
+<td>pull</td>
+<td>10/20/30</td>
+<td>Not measured but assumed by model</td>
+</tr>
+<tr>
+<td>k_on, target AND key</td>
+<td>10<sup>5</sup> M<sup>-1</sup>s<sup>-1</sup></td>
+<td>—</td>
+</tr>
+<tr>
+<td>k_closed</td>
+<td>1s<sup>-1</sup></td>
+<td>—</td>
+</tr>
+</tbody></table>
+<p>Changing k_closed from 0.01 to 10 s<sup>-1</sup> or the key on-rate 100-fold barely moves the results, so the target on-rate is the parameter that matters, and it has not been measured. The model has no temperature dependence.</p>
+
+</div><div class="section-block">
+<h4>Ordinary Differential Equations</h4>
+<p>ODEs show how fast one variable/concentration changes over time. Each term is a reaction with + signs making species and - signs using them. Concentrations are in nM and time is in seconds. The well is assumed well mixed, so time is the only variable.</p>
+<p>Our model tracks 5 primary species/variables: C is the closed system, O is the open system, OT is the open system with PfLDH, XK is the open system with lucKey bound, and XTK is the open system with PfLDH binded and lucKey bound. T and K are PfLDH and LucKey in a free state.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Equation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>C</td>
+<td>−k<sub>open</sub>·C + k<sub>close</sub>·O</td>
+</tr>
+<tr>
+<td>O</td>
+<td>k<sub>open</sub>·C − k<sub>close</sub>·O − k<sub>on,T</sub>·O·[T] + k<sub>on,T</sub>·K<sub>LT</sub>·OT − k<sub>on,K</sub>·O·[K] + k<sub>on,K</sub>·K<sub>CK</sub>·XK</td>
+</tr>
+<tr>
+<td>OT</td>
+<td>k<sub>on,T</sub>·O·[T] − k<sub>on,T</sub>·K<sub>LT</sub>·OT − k<sub>on,K</sub>·OT·[K] + k<sub>on,K</sub>·K<sub>CK</sub>·XTK</td>
+</tr>
+<tr>
+<td>XK</td>
+<td>k<sub>on,K</sub>·O·[K] − k<sub>on,K</sub>·K<sub>CK</sub>·XK − k<sub>on,T</sub>·XK·[T] + k<sub>on,T</sub>·K<sub>LT</sub>·XTK</td>
+</tr>
+<tr>
+<td>XTK</td>
+<td>k<sub>on,K</sub>·OT·[K] − k<sub>on,K</sub>·K<sub>CK</sub>·XTK + k<sub>on,T</sub>·XK·[T] − k<sub>on,T</sub>·K<sub>LT</sub>·XTK</td>
+</tr>
+</tbody></table>
+<p>When lucKey is bound to LOCKR, the system will not be able to close, so XK and XTK have no closing term. This is why adding lucKey to a solution will always increase the luminescence of the LOCKR system.</p>
+<p>LOCKR and lucKey also start as a pre-mixed solution because the system won’t open without the target anyways. Target is also added at t=0.Free target and lucKey are revealed via mass balance, so [T] = T_total − (CT + OT + XTK) and [K] = K_total − (XK + XTK). Therefore, both T and K can run out in a real-life situation. The fraction of glowing systems can be modelled by (XK +XTK)/S_total, where S_total is the total number of systems in solution. FC(t) is the glow with target divided by the glow without, and the detection limit is the lowest PfLDH that gives FC as greater than or equal to 2.</p>
+<p>CT opens at (1+pull) faster in the baseline and reporter topologies because only those have a closed-target state. Full equations can be seen in lockr_kinetic_model.py.</p>
+
+</div><div class="section-block">
+<h4>Results</h4>
+<h5>Validation</h5>
+<p>The ODE(Ordinary Differential Equations) solution matches the closed forms to 1.0 × 10⁻⁵ for the baseline and reporter topologies and 2.6 × 10⁻⁴ for the paper topology. This means that the 11x, 21x, and 31x, showing that the model matches our thermodynamics work for each documented pull value. </p>
+<h5>The assay at 100 nM of switch</h5>
+<p>Under the current model, the equilibrium fold-change is 1.19 at 1 nM PfLDH, 1.58 at 3 nM, 2.9 at 10 nM, 17.8 at 100 nM and 20.6 at 1 µM with a 4.7% background from lucKey. At 3 nM PfLDH the fold-change is 1.04 at 10 minutes, 1.19 at 30 minutes and 1.38 at 60 minutes. The 30-minute detection limit is ~27nM.</p>
+<h5>What sets the detection limit</h5>
+<p>By lowering system concentration, the detection limit of LOCKR become limited. The 30-minute limit for detection in a range from 22-27 nM for every system concentration. The 30-minute fold-change of 2 at 3 nM of PfLDH requires a target on-rate near 10⁶ M<sup>-1</sup>s<sup>-1</sup> and 1 nM of system.</p>
+<h5>The fold-change ceiling and lucKey</h5>
+<p>The ceiling of the published model, 1 + 1 / (K_open (1 + r)), is roughly 20.6 at 500 nM of lucKey, 91.9 at 100 nM, and 501 at 10 nM. Our documentation equations found that the fold-change ceiling remained constant at every lucKey concentration. For v1, the documentation equations provided proof of the ceiling: 10.99, 10.94 and 10.67 at K_open = 5.4 × 10⁻³, 2.9 × 10⁻² and 0.16, respectively.</p>
+
+</div></section><section class="wiki-section toc-section" id="coffee-ring">
+            <h3><span class="chapter-number" aria-hidden="true">01</span><span>Coffee-Ring Assay</span></h3>
+
+
+
+
+
+
+
+
+
+
+          <div class="section-block">
+<h4>Background and Motivation</h4>
+<p>The development of a humidity-and-temperature-controlled chamber was inspired by a lateral flow assay (LFA) designed specifically for detecting malaria parasitemia (<em>Plasmodium falciparum</em> and <em>P. vivax</em>) that was observed at the TSA National Tournament. This prior work demonstrated the effectiveness of spatial concentration mechanisms (specifically coffee ring effects) for improving diagnostic signal in resource-limited settings. We adapted this concept to develop a quantitative malaria diagnostic that would perform reliably across the diverse climate conditions of regions with high disease transmission.</p>
+
+</div><div class="section-block">
+<h4>Environmental Range Definition</h4>
+<p>To ensure our diagnostic works reliably in target endemic regions, we researched average seasonal temperature and humidity patterns across 10 malaria-affected regions spanning South America, Central America, and Africa. We compiled data across multiple biomes within each region, from coastal deserts to highland areas to tropical rainforests, to capture the full range of conditions where malaria transmission occurs.</p>
+<h5>Climate Data Summary</h5>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Biome</th>
+<th>Temperature</th>
+<th>Relative humidity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Peru</td>
+<td>Highland (Andes, ~3,000–4,500 m)</td>
+<td>5–8 °C</td>
+<td>45–75%</td>
+</tr>
+<tr>
+<td>Peru</td>
+<td>Rainforest (Amazon lowlands)</td>
+<td>24–27 °C</td>
+<td>82–88%</td>
+</tr>
+<tr>
+<td>Peru</td>
+<td>Desert (coastal / Atacama edge)</td>
+<td>15–22 °C</td>
+<td>78–85%</td>
+</tr>
+<tr>
+<td>Peru</td>
+<td>Semiarid (inter-Andean valleys)</td>
+<td>14–18 °C</td>
+<td>42–62%</td>
+</tr>
+<tr>
+<td>Amazon Basin</td>
+<td>Tropical rainforest</td>
+<td>26–27 °C</td>
+<td>82–90%</td>
+</tr>
+<tr>
+<td>Amazon Basin</td>
+<td>Grasslands (savanna / Cerrado margins)</td>
+<td>24–26 °C</td>
+<td>55–80%</td>
+</tr>
+<tr>
+<td>Nicaragua</td>
+<td>Caribbean lowlands (tropical rainforest)</td>
+<td>25–27 °C</td>
+<td>80–90%</td>
+</tr>
+<tr>
+<td>Nicaragua</td>
+<td>Central highlands (~1,000–1,800 m)</td>
+<td>17–19 °C</td>
+<td>72–84%</td>
+</tr>
+<tr>
+<td>Nicaragua</td>
+<td>Pacific lowlands (tropical dry forest)</td>
+<td>26–29 °C</td>
+<td>48–75%</td>
+</tr>
+<tr>
+<td>Honduras</td>
+<td>Pine-oak forests (highlands, ~800–2,000 m)</td>
+<td>14–17 °C</td>
+<td>60–80%</td>
+</tr>
+<tr>
+<td>Honduras</td>
+<td>Tropical rainforest / wetland (Mosquitia coast)</td>
+<td>25–27 °C</td>
+<td>83–90%</td>
+</tr>
+<tr>
+<td>Ethiopia</td>
+<td>Tropical savanna (lowlands / SW)</td>
+<td>26–32 °C</td>
+<td>28–72%</td>
+</tr>
+<tr>
+<td>Ethiopia</td>
+<td>Temperate dry (highlands, ~2,000–3,000 m)</td>
+<td>13–17 °C</td>
+<td>35–75%</td>
+</tr>
+<tr>
+<td>Eritrea</td>
+<td>Xeric grasslands / shrublands (coastal / Danakil)</td>
+<td>30–34 °C</td>
+<td>28–48%</td>
+</tr>
+<tr>
+<td>Eritrea</td>
+<td>Sahelian / Sudanian Acacia savanna</td>
+<td>28–32 °C</td>
+<td>28–62%</td>
+</tr>
+<tr>
+<td>Eritrea</td>
+<td>Acacia-Commiphora bushland &amp; thickets</td>
+<td>23–27 °C</td>
+<td>35–65%</td>
+</tr>
+<tr>
+<td>Eritrea</td>
+<td>Montane forests &amp; grasslands (~1,800–3,000 m)</td>
+<td>13–16 °C</td>
+<td>42–78%</td>
+</tr>
+</tbody></table>
+<h5>Derived Testing Range</h5>
+<p>Across all regions, seasons, and biomes, the extreme limits are:</p>
+<ul>
+<li><strong>Temperature range:</strong> 5–34 °C (absolute minimum to maximum)</li>
+<li><strong>Humidity range:</strong> 28–90% RH (absolute minimum to maximum)</li>
+</ul>
+<p>These extremes define the operational envelope our chamber and assay must tolerate. However, we also identified that most endemic transmission occurs in zones with either:</p>
+<ul>
+<li><strong>High temperature + high humidity</strong> (tropical rainforests, Caribbean lowlands): 24–27 °C, 80–90% RH</li>
+<li><strong>Moderate temperature + variable humidity</strong> (inter-Andean valleys, highland regions): 13–18 °C, 40–85% RH</li>
+</ul>
+<p>This bimodal distribution informed our prioritization of test conditions: we focused initially on the high-transmission tropical regimes while ensuring robustness across the full 5–34 °C and 28–90% RH envelope.</p>
+
+</div><div class="section-block">
+<h4>Foundational Physics and Reagent Strategy</h4>
+<p>To understand the underlying physics governing droplet drying and particle concentration, we conducted a literature review focusing on evaporation-driven particle migration. A key reference provided the mathematical framework for modeling contact line pinning, capillary flow, and particle advection during drying source. From this work, we identified that:</p>
+<ul>
+<li><strong>Contact line pinning</strong> is essential for generating a stable coffee ring: the contact line must remain fixed at a defined radius to produce a predictable circular particle deposit at the edge of the dried droplet.</li>
+<li><strong>Blocking agents</strong> prevent non-specific binding and signal noise. Following the methodology of prior work, we incorporated stabilizers (to be detailed by the testing team) into the assay buffer to control evaporation rates and reduce spurious signal.</li>
+<li><strong>Particle-fluid interactions</strong> during evaporation depend critically on:<ul>
+<li>Particle size (gravity vs. Brownian motion)</li>
+<li>Droplet volume (drying time and total particle flux to the contact line)</li>
+<li>Temperature and humidity (evaporation kinetics and fluid viscosity)</li>
+</ul>
+</li>
+</ul>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig01-coffee-ring.avif" alt="How a coffee ring forms. Faster evaporation at the pinned edge drives an outward flow that carries particles to the rim. Schematic, not to scale (height exaggerated 1.6×). Arrow lengths follow J ∝ (1 − r²/R²)^−λ with λ = 0.41.   Image generated by Claude." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">How a coffee ring forms. Faster evaporation at the pinned edge drives an outward flow that carries particles to the rim. Schematic, not to scale (height exaggerated 1.6×). Arrow lengths follow J ∝ (1 − r²/R²)^−λ with λ = 0.41.   Image generated by Claude.</p>
+</div><div class="section-block">
+<h4>Initial Modeling Approach and Pivot to Experimental Testing</h4>
+<p>Our initial strategy was to develop a quantitative model in MATLAB that would:</p>
+<ul>
+<li>Predict advection versus diffusion contributions for particles of varying sizes</li>
+<li>Correlate particle size, droplet volume, and temperature/humidity to final deposit geometry</li>
+<li>Optimize assay parameters (e.g., microsphere/particle concentration, droplet size) to maximize signal concentration at the test line</li>
+</ul>
+<p>However, the learning curve for modifying complex evaporation equations in MATLAB, combined with the time required to validate the model against experimental data, became a bottleneck during our high-contact collaboration phase. We therefore made a strategic decision: defer detailed MATLAB modeling to periods of lower in-person meeting frequency, and use our lab time to experimentally validate the chamber environment and assay behavior under real-world climate conditions.</p>
+<p>This pivot allowed us to:</p>
+<ul>
+<li>Rapidly test the chamber's ability to maintain stable temperature and humidity</li>
+<li>Characterize how droplet drying kinetics change across a wide range of environmental conditions</li>
+<li>Optimize the assay before investing in comprehensive mathematical modeling</li>
+</ul>
+
+</div><div class="section-block">
+<h4>Model Description</h4>
+<h5>Droplet Geometry</h5>
+<p>Each droplet is treated as a spherical cap with a fixed contact radius, and the angle can then be derived using two easily measurable values: the plated volume and the radius of the dried droplet.</p>
+<p>The radius <em>R</em> is the outer edge of the deposit, determined by its % intensity of the max. The volume V<sub>0</sub> is the plated volume, 5 µL. A spherical cap of height <em>h</em> has volume:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mi>π</mi><mi>h</mi></mrow><mn>6</mn></mfrac><mrow><mo fence="true" form="prefix">(</mo><mn>3</mn><msup><mi>R</mi><mn>2</mn></msup><mo>+</mo><msup><mi>h</mi><mn>2</mn></msup><mo fence="true" form="postfix">)</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Standard spherical-cap geometry, see Der. 1</p><p>This is a cubic, and can be solved with one real root:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>h</mi><mo>=</mo><mroot><mrow><mi>u</mi><mo>+</mo><msqrt><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><msup><mi>R</mi><mn>6</mn></msup></mrow></msqrt></mrow><mn>3</mn></mroot><mo>−</mo><mroot><mrow><msqrt><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><msup><mi>R</mi><mn>6</mn></msup></mrow></msqrt><mo>−</mo><mi>u</mi></mrow><mn>3</mn></mroot><mo separator="true">,</mo><mspace width="2em"></mspace><mi>u</mi><mo>=</mo><mfrac><mrow><mn>3</mn><msub><mi>V</mi><mn>0</mn></msub></mrow><mi>π</mi></mfrac></mrow></math></p>
+<p class="eq-source">Source: Cardano’s formula for a cubic, applied to the spherical-cap equation</p><p><math display="block" style="display:block math;"><mrow><msub><mi>θ</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mrow><mspace width="0.1667em"></mspace><mi>arctan</mi><mo>⁡</mo></mrow><mrow><mo fence="true" form="prefix">(</mo><mfrac><mi>h</mi><mi>R</mi></mfrac><mo fence="true" form="postfix">)</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Standard spherical-cap geometry</p>
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig03-droplet-geometry.avif" alt="Geometry of the baseline droplet (V₀ = 5 µL, R = 2.33 mm), drawn to scale, and the cap as a slice of a sphere. Image generated by Claude." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Geometry of the baseline droplet (V₀ = 5 µL, R = 2.33 mm), drawn to scale, and the cap as a slice of a sphere. Image generated by Claude.</p>
+<p>For our baseline droplets (V<sub>0</sub> = 5 µL, <em>R</em> = 2.33 mm), these calculations give <em>h</em> ≈ 575 µm and θ = 27.7°. Manually calculating the angle of a 5 µL droplet proved difficult without precise and specific equipment, so back-calculating the angle formed by the droplet is simpler and efficient.</p>
+<p>The transport equations use the thin-film center height and aspect ratio:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>h</mi><mi>c</mi></msub><mo>=</mo><mfrac><mrow><mn>2</mn><msub><mi>V</mi><mn>0</mn></msub></mrow><mrow><mi>π</mi><msup><mi>R</mi><mn>2</mn></msup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mi>ε</mi><mo>=</mo><mfrac><msub><mi>h</mi><mi>c</mi></msub><mi>R</mi></mfrac></mrow></math></p>
+<p class="eq-source">Source: Thin-film approximation (Oron et al., 1997; Hu &amp; Larson, 2005a)</p><p>Here ε ≈ 0.25, so the droplet is only moderately thin. The thin-film (lubrication) approximation assumes ε ≪ 1, so at this angle it is an approximation; it is the same as the nominal case in Revision 2.0. The exact cap height and this thin-film height differ by about 2%.</p>
+<details>
+<summary>Derivation 1: cap volume, contact angle and thin-film height</summary><p>The cap is the top slice of a sphere of radius a = (R² + h²)/(2h). Summing thin horizontal discs of radius √(a² − z²) between z = a − h and z = a gives its volume:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><msubsup><mo movablelimits="false">∫</mo><mrow><mi>a</mi><mo>−</mo><mi>h</mi></mrow><mi>a</mi></msubsup><mi>π</mi><mrow><mo fence="true" form="prefix">(</mo><msup><mi>a</mi><mn>2</mn></msup><mo>−</mo><msup><mi>z</mi><mn>2</mn></msup><mo fence="true" form="postfix">)</mo></mrow><mi>d</mi><mi>z</mi><mo>=</mo><mfrac><mrow><mi>π</mi><msup><mi>h</mi><mn>2</mn></msup><mo form="prefix" stretchy="false">(</mo><mn>3</mn><mi>a</mi><mo>−</mo><mi>h</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow><mn>3</mn></mfrac><mo>=</mo><mfrac><mrow><mi>π</mi><mi>h</mi></mrow><mn>6</mn></mfrac><mrow><mo fence="true" form="prefix">(</mo><mn>3</mn><msup><mi>R</mi><mn>2</mn></msup><mo>+</mo><msup><mi>h</mi><mn>2</mn></msup><mo fence="true" form="postfix">)</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Standard result; integration shown in this work.</p><p>Rearranged, this is a cubic in <em>h</em> with no squared term:</p>
+<p><math display="block" style="display:block math;"><mrow><msup><mi>h</mi><mn>3</mn></msup><mo>+</mo><mn>3</mn><msup><mi>R</mi><mn>2</mn></msup><mi>h</mi><mo>−</mo><mfrac><mrow><mn>6</mn><msub><mi>V</mi><mn>0</mn></msub></mrow><mi>π</mi></mfrac><mo>=</mo><mn>0</mn></mrow></math></p>
+<p class="eq-source">Source: Standard result; rearrangement of the cap-volume equation.</p><p>Its coefficient on <em>h</em> is positive, so it has exactly one real root, given by Cardano's formula above. At the edge the cap meets the slide at angle θ, with sin θ = R/a and h = a(1 − cos θ). Dividing:</p>
+<p><math display="block" style="display:block math;"><mrow><mfrac><mi>h</mi><mi>R</mi></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mrow><mi>cos</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><mi>θ</mi></mrow><mrow><mrow><mi>sin</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><mi>θ</mi></mrow></mfrac><mo>=</mo><mrow><mi>tan</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><mfrac><mi>θ</mi><mn>2</mn></mfrac></mrow></math></p>
+<p class="eq-source">Source: Standard result (trigonometric half-angle identity).</p><p>For a thin droplet the cap is close to a paraboloid, h(r) = h<sub>c</sub>(1 − r²/R²) (Hu &amp; Larson, 2005a). Integrating over rings of radius r and width dr:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><msubsup><mo movablelimits="false">∫</mo><mn>0</mn><mi>R</mi></msubsup><mn>2</mn><mi>π</mi><mi>r</mi><mspace width="0.1667em"></mspace><msub><mi>h</mi><mi>c</mi></msub><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><msup><mi>r</mi><mn>2</mn></msup><msup><mi>R</mi><mn>2</mn></msup></mfrac><mo fence="true" form="postfix">)</mo></mrow><mi>d</mi><mi>r</mi><mo>=</mo><mfrac><mrow><mi>π</mi><msub><mi>h</mi><mi>c</mi></msub><msup><mi>R</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><msub><mi>h</mi><mi>c</mi></msub><mo>=</mo><mfrac><mrow><mn>2</mn><msub><mi>V</mi><mn>0</mn></msub></mrow><mrow><mi>π</mi><msup><mi>R</mi><mn>2</mn></msup></mrow></mfrac></mrow></math></p>
+<p class="eq-source">Source: Derived in this work (Revision 2.0), using the parabolic film profile of Hu &amp; Larson (2005a).</p></details><h5>Assumptions</h5>
+<ul>
+<li>The contact line is assumed to remain constant from placement to drying. This was confirmed during testing, as droplet radii did not shift (unless in an abnormal condition).</li>
+<li>The droplet is a spherical cap, meaning gravity has not flattened it. This holds when <em>R</em> is smaller than the capillary length, ℓ<sub>c</sub> = √(γ / ρg). Our <em>R</em> = 2.33 mm is close to it, so gravity only slightly flattens the droplet, maintaining the spherical-cap assumption.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Baseline value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>u = 3V₀/π</td>
+<td>4.77 × 10⁻⁹ m³</td>
+</tr>
+<tr>
+<td>h, exact cap height</td>
+<td>575 µm</td>
+</tr>
+<tr>
+<td>θ₀ = 2 arctan(h/R)</td>
+<td>27.7° (0.484 rad)</td>
+</tr>
+<tr>
+<td>h<sub>c</sub> = 2V₀/(πR²), thin-film height</td>
+<td>586 µm</td>
+</tr>
+<tr>
+<td>ε = h<sub>c</sub>/R</td>
+<td>0.25</td>
+</tr>
+<tr>
+<td>Capillary length, γ = 0.055 N/m</td>
+<td>2.34 mm</td>
+</tr>
+<tr>
+<td>Bond number ρgR²/γ</td>
+<td>0.99</td>
+</tr>
+</tbody></table>
+
+</div><div class="section-block">
+<h4>Evaporation and Drying Time</h4>
+<h5>Vapour Diffusion</h5>
+<p>The time a droplet takes to dry is set by how fast water vapour can diffuse into the surrounding air, not by how fast molecules leave the surface (Wilson &amp; D'Ambrosio, 2023).</p>
+<p>The most water vapour air can hold rises steeply with the ambient temperature, following the Clausius–Clapeyron relation:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>ρ</mi><mtext>sat</mtext></msub><mo form="prefix" stretchy="false">(</mo><mi>T</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><msub><mi>ρ</mi><mtext>ref</mtext></msub><mrow><mi>exp</mi><mo>⁡</mo></mrow><mrow><mo fence="true" form="prefix">[</mo><mfrac><msub><mi>L</mi><mi>v</mi></msub><msub><mi>R</mi><mi>v</mi></msub></mfrac><mrow><mo fence="true" form="prefix">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mtext>ref</mtext></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><mo fence="true" form="postfix">)</mo></mrow><mo fence="true" form="postfix">]</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Integrated Clausius–Clapeyron relation, with standard properties. See Der. 2.</p><p>The formula assumes that ρ<sub>ref</sub> = 0.023 kg/m³ at T<sub>ref</sub> = 298.15 K, L<sub>v</sub> = 2.26 × 10⁶ J/kg is the latent heat of vaporization, and R<sub>v</sub> = 461.5 J/(kg·K) is the gas constant for water vapour.</p>
+<details>
+<summary>Derivation 2: saturated vapour density (Clausius–Clapeyron)</summary><p>This comes from integrating the Clausius–Clapeyron equation from T<sub>ref</sub> to T:</p>
+<p><math display="block" style="display:block math;"><mrow><mfrac><mrow><mi>d</mi><mrow><mspace width="0.1667em"></mspace><mi>ln</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><msub><mi>p</mi><mtext>sat</mtext></msub></mrow><mrow><mi>d</mi><mi>T</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>L</mi><mi>v</mi></msub><mrow><msub><mi>R</mi><mi>v</mi></msub><msup><mi>T</mi><mn>2</mn></msup></mrow></mfrac><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mrow><mi>ln</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><mfrac><mrow><msub><mi>p</mi><mtext>sat</mtext></msub><mo form="prefix" stretchy="false">(</mo><mi>T</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow><mrow><msub><mi>p</mi><mtext>sat</mtext></msub><mo form="prefix" stretchy="false">(</mo><msub><mi>T</mi><mtext>ref</mtext></msub><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></mfrac><mo>=</mo><mfrac><msub><mi>L</mi><mi>v</mi></msub><msub><mi>R</mi><mi>v</mi></msub></mfrac><mrow><mo fence="true" form="prefix">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mtext>ref</mtext></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><mo fence="true" form="postfix">)</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Standard result (Clausius–Clapeyron relation).</p><p>We apply the same factor to vapour density. That drops a small T<sub>ref</sub>/T factor from the ideal-gas law, worth about 4% between 25 and 37 °C.</p>
+</details><p>Similar to other diffusion laws, evaporation is driven by the difference in vapour density at the droplet vs. in the room:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mi mathvariant="normal">Δ</mi></mrow><msub><mi>ρ</mi><mi>v</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">(</mo><msub><mi>a</mi><mi>w</mi></msub><mo>−</mo><mi>H</mi><mo form="postfix" stretchy="false">)</mo><mspace width="0.1667em"></mspace><msub><mi>ρ</mi><mtext>sat</mtext></msub><mo form="prefix" stretchy="false">(</mo><mi>T</mi><mo form="postfix" stretchy="false">)</mo></mrow></math></p>
+<p class="eq-source">Source: Hu &amp; Larson (2002), with the surface vapour density scaled by water activity a<sub>w</sub> (this work, Revision 2.0).</p><p>a<sub>w</sub> is the water activity at the surface, and <em>H</em> is the relative humidity given as a fraction. If the relative humidity were to equal the water activity, evaporation would cease.</p>
+<details>
+<summary>Derivation 3: evaporation rate from vapour diffusion</summary><p>Outside the droplet, the vapour concentration <em>c</em> obeys steady diffusion, which is Laplace's equation (Deegan et al., 2000; Popov, 2005):</p>
+<p><math display="block" style="display:block math;"><mrow><msup><mo>∇</mo><mn>2</mn></msup><mi>c</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mspace width="2em"></mspace><mi>c</mi><mo>=</mo><msub><mi>a</mi><mi>w</mi></msub><mspace width="0.1667em"></mspace><msub><mi>ρ</mi><mtext>sat</mtext></msub><mtext>&nbsp;on&nbsp;the&nbsp;droplet</mtext><mo separator="true">,</mo><mspace width="2em"></mspace><mfrac><mrow><mi>∂</mi><mi>c</mi></mrow><mrow><mi>∂</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mn>0</mn><mtext>&nbsp;on&nbsp;the&nbsp;dry&nbsp;slide</mtext><mo separator="true">,</mo><mspace width="2em"></mspace><mi>c</mi><mo>→</mo><mi>H</mi><msub><mi>ρ</mi><mtext>sat</mtext></msub><mtext>&nbsp;far&nbsp;away</mtext></mrow></math></p>
+<p class="eq-source">Source: Deegan et al. (2000); Popov (2005).</p><p>The evaporative flux (the rate at which liquid turns into vapour and crosses a given surface area per unit of time) is the outward gradient, and the total rate is that flux summed over the droplet's surface:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>J</mi><mo>=</mo><mo form="prefix" stretchy="false">−</mo><msub><mi>D</mi><mi>v</mi></msub><mspace width="0.1667em"></mspace><mo>∇</mo><mi>c</mi><mo>⋅</mo><mi>𝐧</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mrow><mo fence="true" form="prefix">|</mo><mfrac><mrow><mi>d</mi><mi>m</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="true" form="postfix">|</mo></mrow><mo>=</mo><msub><mo movablelimits="false">∬</mo><mtext>surface</mtext></msub><mi>J</mi><mspace width="0.1667em"></mspace><mi>d</mi><mi>S</mi></mrow></math></p>
+<p class="eq-source">Source: Deegan et al. (2000); Popov (2005).</p></details><h5>Evaporation Rate</h5>
+<p>For a droplet on a flat, fixed surface in still air:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mo fence="true" form="prefix">|</mo><mfrac><mrow><mi>d</mi><mi>m</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="true" form="postfix">|</mo></mrow><mo>=</mo><mi>π</mi><mi>R</mi><mspace width="0.1667em"></mspace><msub><mi>D</mi><mi>v</mi></msub><mspace width="0.1667em"></mspace><mrow><mi mathvariant="normal">Δ</mi></mrow><msub><mi>ρ</mi><mi>v</mi></msub><mspace width="0.1667em"></mspace><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>θ</mi><mo form="postfix" stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"></mspace><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>θ</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mn>1.3</mn><mo>+</mo><mn>0.27</mn><mspace width="0.1667em"></mspace><msup><mi>θ</mi><mn>2</mn></msup></mrow></math></p>
+<p class="eq-source">Source: Hu &amp; Larson (2002); see also Picknett &amp; Bexon (1977); see Der. 3.</p><p>|dm/dt| is the evaporation rate. The rate depends on <em>R</em>, not <em>R</em>²: it is concentrated at the droplet's edge rather than spread over its entire surface. D<sub>v</sub> is the diffusivity of water vapour, 2.6 × 10⁻⁵ m²/s at 25 °C; it changes with temperature as (T/T<sub>ref</sub>)<sup>1.5</sup>. At the example starting angle, f(θ) ≈ 1.36. As the droplet evaporates it thins and its angle shrinks, so the evaporation rate slows with time. The calculated predictions hold the rate at its starting value, making the drying-time predictions marginally shorter.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig04-evaporative-flux.avif" alt="Vapor concentration around the droplet and the evaporative flux, which rises sharply toward the contact line. Image generated by Claude." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Vapor concentration around the droplet and the evaporative flux, which rises sharply toward the contact line. Image generated by Claude.</p>
+<h5>Drying Time</h5>
+<p>Assuming a constant rate:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>t</mi><mi>f</mi></msub><mo>=</mo><mfrac><mrow><mi>ρ</mi><mspace width="0.1667em"></mspace><msub><mi>V</mi><mn>0</mn></msub></mrow><mrow><mi>|</mi><mi>d</mi><mi>m</mi><mi>/</mi><mi>d</mi><mi>t</mi><mi>|</mi></mrow></mfrac></mrow></math></p>
+<p class="eq-source">Source: Derived in this work (Revision 2.0) from mass conservation; see Der. 4.</p><details>
+<summary>Derivation 4: drying time</summary><p>This follows from mass conservation. The droplet loses liquid only by evaporation, so with the rate held constant:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>ρ</mi><mspace width="0.1667em"></mspace><mfrac><mrow><mi>d</mi><mi>V</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo form="prefix" stretchy="false">−</mo><mrow><mo fence="true" form="prefix">|</mo><mfrac><mrow><mi>d</mi><mi>m</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="true" form="postfix">|</mo></mrow><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><msubsup><mo movablelimits="false">∫</mo><msub><mi>V</mi><mn>0</mn></msub><mn>0</mn></msubsup><mi>ρ</mi><mspace width="0.1667em"></mspace><mi>d</mi><mi>V</mi><mo>=</mo><mo form="prefix" stretchy="false">−</mo><mrow><mo fence="true" form="prefix">|</mo><mfrac><mrow><mi>d</mi><mi>m</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="true" form="postfix">|</mo></mrow><msubsup><mo movablelimits="false">∫</mo><mn>0</mn><msub><mi>t</mi><mi>f</mi></msub></msubsup><mi>d</mi><mi>t</mi></mrow></math></p>
+<p class="eq-source">Source: Derived in this work (Revision 2.0), from mass conservation.</p></details><p>The deposit stops moving slightly before t<sub>f</sub>, at a stopping time t*. The measured stop times are compared with t*, which also determines the fraction of tracer (visualizer) that reaches the ring.</p>
+<h5>Chamber Airflow</h5>
+<p>Inside the environmental chamber (see Hardware), air is forced in as part of how the chamber controls humidity and temperature. Forced air sweeps away the humid layer around the droplet, speeding up drying. We multiply the rate by a Sherwood number, measured by comparing open-bench drying times with closed-chamber drying times:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mtext></mtext><mi>Sh</mi></mrow><mo>=</mo><mfrac><msub><mi>t</mi><mtext>dry,&nbsp;bench</mtext></msub><msub><mi>t</mi><mtext>dry,&nbsp;chamber</mtext></msub></mfrac><mo>≈</mo><mn>1.65</mn></mrow></math></p>
+<p class="eq-source">Source: Defined and measured in this work (see Hardware).</p><p>To ensure validity, the environment within the chamber was set to the exact conditions of the ambient environment. This lessens the possibility of confounding variables affecting the resulting factor.</p>
+<h5>Assumptions</h5>
+<ul>
+<li>Surface (substrate) and air temperature are assumed to be the same. Evaporation cools the droplet, which lowers the driving force by about 12% at 55% RH.</li>
+<li>As protein concentrates near the edge late in drying, the water activity drops. However, prediction calculations assume the water activity stays constant.</li>
+<li>The Hu–Larson fit f(θ) is assumed to hold for all droplets. At the baseline of θ ≈ 28°, this is well inside the range it is best for.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Baseline value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ρ<sub>sat</sub> at 296.65 K</td>
+<td>0.0212 kg/m³</td>
+</tr>
+<tr>
+<td>Δρ<sub>v</sub> = (a<sub>w</sub> − H) ρ<sub>sat</sub></td>
+<td>0.00931 kg/m³</td>
+</tr>
+<tr>
+<td>D<sub>v</sub> at 23.5 °C</td>
+<td>2.58 × 10⁻⁵ m²/s</td>
+</tr>
+<tr>
+<td>f(θ₀) = 1.3 + 0.27θ₀²</td>
+<td>1.363</td>
+</tr>
+<tr>
+<td>|dm/dt| = πR D<sub>v</sub> Δρ<sub>v</sub> f(θ₀)</td>
+<td>2.40 × 10⁻⁹ kg/s</td>
+</tr>
+<tr>
+<td>t<sub>f</sub> = ρV₀ / |dm/dt|</td>
+<td>2127 s (35.4 min)</td>
+</tr>
+<tr>
+<td>t* = 0.92 t<sub>f</sub></td>
+<td>1957 s (32.6 min)</td>
+</tr>
+<tr>
+<td>t<sub>f</sub> with evaporative cooling (not used)</td>
+<td>40.5 min</td>
+</tr>
+<tr>
+<td>Measured arrest time</td>
+<td>~31 min</td>
+</tr>
+</tbody></table>
+
+</div><div class="section-block">
+<h4>Transport and Ring Formation</h4>
+<p>A ring forms because of the outward flow during evaporation, which carries particles to the edge faster than diffusion can spread them out (Deegan et al., 1997; reviewed in Larson, 2014). The ring's width is then determined by how much solid material has to fit there.</p>
+<p>Because the droplet is thin, the flow can be described by its height-averaged radial velocity ū(r, t) (the lubrication approximation; Oron et al., 1997). Conserving liquid and tracer (concentration <em>c</em>) in a thin ring at radius <em>r</em> gives (Deegan et al., 2000; Moore et al., 2021):</p>
+<p><math display="block" style="display:block math;"><mrow><mfrac><mrow><mi>∂</mi><mi>h</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mi>r</mi></mfrac><mfrac><mi>∂</mi><mrow><mi>∂</mi><mi>r</mi></mrow></mfrac><mrow><mo fence="true" form="prefix">(</mo><mi>r</mi><mi>h</mi><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mo fence="true" form="postfix">)</mo></mrow><mo>=</mo><mo form="prefix" stretchy="false">−</mo><mfrac><mi>J</mi><mi>ρ</mi></mfrac></mrow></math></p>
+<p class="eq-source">Source: Deegan et al. (2000); Hu &amp; Larson (2005a); thin-film form from Oron et al. (1997).</p><p><math display="block" style="display:block math;"><mrow><mfrac><mrow><mi>∂</mi><mo form="prefix" stretchy="false">(</mo><mi>h</mi><mi>c</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mi>r</mi></mfrac><mfrac><mi>∂</mi><mrow><mi>∂</mi><mi>r</mi></mrow></mfrac><mrow><mo fence="true" form="prefix">(</mo><mi>r</mi><mi>h</mi><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mi>c</mi><mo fence="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mi>r</mi></mfrac><mfrac><mi>∂</mi><mrow><mi>∂</mi><mi>r</mi></mrow></mfrac><mrow><mo fence="true" form="prefix">(</mo><mi>r</mi><mi>h</mi><msub><mi>D</mi><mi>i</mi></msub><mfrac><mrow><mi>∂</mi><mi>c</mi></mrow><mrow><mi>∂</mi><mi>r</mi></mrow></mfrac><mo fence="true" form="postfix">)</mo></mrow></mrow></math></p>
+<p class="eq-source">Source: Moore et al. (2021).</p><p>On the left of each equation is the storage and outward transport; on the right is the loss to evaporation and the spreading of the tracer by diffusion. Since the contact line of the droplet is assumed (and found) to be constant, integrating the first equation from <em>r</em> to <em>R</em> gives the flow directly:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>r</mi><mi>h</mi><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mo>=</mo><msubsup><mo movablelimits="false">∫</mo><mi>r</mi><mi>R</mi></msubsup><mrow><mo fence="true" form="prefix">(</mo><mfrac><mi>J</mi><mi>ρ</mi></mfrac><mo>+</mo><mfrac><mrow><mi>∂</mi><mi>h</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac><mo fence="true" form="postfix">)</mo></mrow><msup><mi>r</mi><mo lspace="0em" rspace="0em">′</mo></msup><mspace width="0.1667em"></mspace><mi>d</mi><msup><mi>r</mi><mo lspace="0em" rspace="0em">′</mo></msup></mrow></math></p>
+<p class="eq-source">Source: Deegan et al. (2000).</p><p>The outward flow at any radius <strong>must</strong> supply all the evaporation beyond that radius, minus the liquid freed as the film thins at that point. Evaporation is concentrated at the edge, but thinning is even across the droplet, so the net flow is outward and carries particles to the ring of the deposit.</p>
+<p>The outward flow has a speed of U = R/t<sub>f</sub>. A Peclet number compares the carrying of particles in that flow with the spreading by diffusion. </p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mtext></mtext><mi>Pe</mi></mrow><mo>=</mo><mfrac><mrow><mi>U</mi><mi>R</mi></mrow><msub><mi>D</mi><mi>i</mi></msub></mfrac><mo>=</mo><mfrac><msup><mi>R</mi><mn>2</mn></msup><mrow><msub><mi>t</mi><mi>f</mi></msub><mspace width="0.1667em"></mspace><msub><mi>D</mi><mi>i</mi></msub></mrow></mfrac></mrow></math> </p>
+<p><em>Source: Standard definition of the Péclet number; see Moore et al. (2021).</em></p>
+<p>D<sub>i</sub> represents the diffusivity of the particles within the droplet. Pe&gt;&gt; means a ring forms, and Pe&lt;&lt;1 means the ring is smoothed out by the spreading diffusion. For 20nm microsphere beads, D<sub>i</sub> is assumed at D<sub>i</sub> ≈ 2.1 × 10⁻¹¹ m²/s, given by the Stokes-Einstein relation; (10 nm bead radius, 4.5% BSA at 23.5 °C; Einstein, 1905),  </p>
+<p><math display="block" style="display:block math;"><mrow><mi>D</mi><mo>=</mo><mfrac><mrow><msub><mi>k</mi><mi>B</mi></msub><mi>T</mi></mrow><mrow><mn>6</mn><mi>π</mi><mi>η</mi><mi>r</mi></mrow></mfrac></mrow></math></p>
+<p>Evaporation is s strongest right at the edge of the deposit rises toward it as a power of the distance s from the edge: </p>
+<p><math display="block" style="display:block math;"><mrow><mi>J</mi><mo>∝</mo><msup><mi>s</mi><mrow><mo lspace="0em" rspace="0em">−</mo><mi>λ</mi></mrow></msup><mo separator="true">,</mo><mspace width="2em"></mspace><mi>λ</mi><mo>=</mo><mfrac><mrow><mi>π</mi><mo>−</mo><mn>2</mn><mi>θ</mi></mrow><mrow><mn>2</mn><mi>π</mi><mo>−</mo><mn>2</mn><mi>θ</mi></mrow></mfrac></mrow></math><br>Source: Deegan et al. (2000); see Der. 5.<br>λ for a flat droplet, with the strongest edge evaporation, is ~.5. For a perfect hemisphere λ = 0. At the example droplet of θ ≈ 27.7°, λ ≈ 0.41 the edge evaporation is enhanced while still following the spherical-cap flow equations.  </p>
+<details> <summary>Derivation 5: edge-evaporation exponent λ</summary> 
+Close to the edge, the air between the droplet surface and slide forms a wedge with the angle 
+β = π − θ (rad) .  
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig05-contact-line-wedge.avif" alt="The air wedge at the contact line, used to derive the edge exponent λ. Image generated by Claude." style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">The air wedge at the contact line, used to derive the edge exponent λ. Image generated by Claude.</p>
+<p>ϱ representing distance from the contact line and φ representing the angle at the droplet surface, Laplace’s equation has a seperable solutions </p>
+<p><math display="block" style="display:block math;"><mrow><mi>c</mi><mo>−</mo><msub><mi>c</mi><mi>s</mi></msub><mo>∝</mo><msup><mi>ϱ</mi><mi>ν</mi></msup><mrow><mi>sin</mi><mo>⁡</mo></mrow><mo form="prefix" stretchy="false">(</mo><mi>ν</mi><mi>φ</mi><mo form="postfix" stretchy="false">)</mo></mrow></math><br>Source: Deegan et al. (2000).</p>
+<p>This matches the concentration at the droplet surface where (φ = 0). For there to be no flux into the slide (φ = β), cos(νβ) = 0. Thus, ν = π/(2β). The flux represents how steeply concentration with distance, so:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>J</mi><mo>∝</mo><msup><mi>ϱ</mi><mrow><mi>ν</mi><mo>−</mo><mn>1</mn></mrow></msup><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mi>λ</mi><mo>=</mo><mn>1</mn><mo>−</mo><mi>ν</mi><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mi>π</mi><mrow><mn>2</mn><mo form="prefix" stretchy="false">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>π</mi><mo>−</mo><mn>2</mn><mi>θ</mi></mrow><mrow><mn>2</mn><mi>π</mi><mo>−</mo><mn>2</mn><mi>θ</mi></mrow></mfrac></mrow></math><br>Source: Deegan et al. (2000); steps written out in this work.</p>
+</details> <p>There are two different methods of determining the width of the ring: One by the limitations of diffusion, assuming that there is too little solid to pack the edge, and one limited by material packing,  where the ring cannot be narrower than the space required to hold the solid material delivered to it. </p>
+<p>For Version 1, where ring width is limited by diffusion::<br>Near the edge, flow speeds up as determined by the previous formula of u ≈ C s<sup>(−λ)</sup> . </p>
+<p>The ring is a thin layer where the inward-pushing flow balances the diffusion spreading he tracer back out (Moore Et Al., 2021)</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>w</mi><mtext>diff</mtext></msub><mo>=</mo><msup><mrow><mo fence="true" form="prefix">[</mo><mfrac><mrow><msub><mi>D</mi><mi>i</mi></msub><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow><mi>C</mi></mfrac><mo fence="true" form="postfix">]</mo></mrow><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>λ</mi></mrow></mfrac></msup><mo separator="true">,</mo><mspace width="2em"></mspace><mi>C</mi><mo>=</mo><mfrac><mrow><mi>Q</mi><mspace width="0.1667em"></mspace><msup><mi>R</mi><mrow><mi>λ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><mrow><mi>π</mi><mspace width="0.1667em"></mspace><msup><mn>2</mn><mrow><mn>1</mn><mo>+</mo><mi>λ</mi></mrow></msup><mspace width="0.1667em"></mspace><msub><mi>h</mi><mi>c</mi></msub></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mi>Q</mi><mo>=</mo><mfrac><msub><mi>V</mi><mn>0</mn></msub><msub><mi>t</mi><mi>f</mi></msub></mfrac></mrow></math><br>Source: Derived in this work (Revision 2.0), adapting the flow–diffusion balance of Moore et al. (2021) to a general edge exponent λ; see Der. 6.</p>
+<details> <summary>Derivation 6: diffusion-limited ring width w_diff</summary> <p>Given s = R - r for distance from the edge: Near-edge flux is given as J ≈ A(2s/R)<sup>−λ </sup>. By making the total required to equal the evaporation rate, A is fixed:<br><math display="block" style="display:block math;"><mrow><msubsup><mo movablelimits="false">∫</mo><mn>0</mn><mi>R</mi></msubsup><mn>2</mn><mi>π</mi><mi>r</mi><mspace width="0.1667em"></mspace><mfrac><mi>A</mi><mi>ρ</mi></mfrac><msup><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><msup><mi>r</mi><mn>2</mn></msup><msup><mi>R</mi><mn>2</mn></msup></mfrac><mo fence="true" form="postfix">)</mo></mrow><mrow><mo lspace="0em" rspace="0em">−</mo><mi>λ</mi></mrow></msup><mi>d</mi><mi>r</mi><mo>=</mo><mfrac><mrow><mi>π</mi><mi>A</mi><msup><mi>R</mi><mn>2</mn></msup></mrow><mrow><mi>ρ</mi><mspace width="0.1667em"></mspace><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></mfrac><mo>=</mo><mi>Q</mi><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mfrac><mi>A</mi><mi>ρ</mi></mfrac><mo>=</mo><mfrac><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo form="postfix" stretchy="false">)</mo><mspace width="0.1667em"></mspace><mi>Q</mi></mrow><mrow><mi>π</mi><msup><mi>R</mi><mn>2</mn></msup></mrow></mfrac></mrow></math> </p>
+<p>Then, put this term into the flow integral and keep the leading in terms of s. The thinning is slightly smaller near the edge. Dividing by rh≈ 2h<sub>c</sub>s gives the near-edge speed: </p>
+<p><math display="block" style="display:block math;"><mrow><mi>r</mi><mi>h</mi><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mo>≈</mo><mfrac><mrow><mi>Q</mi><mspace width="0.1667em"></mspace><msup><mi>R</mi><mrow><mi>λ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><mrow><mi>π</mi><mspace width="0.1667em"></mspace><msup><mn>2</mn><mi>λ</mi></msup></mrow></mfrac><mspace width="0.1667em"></mspace><msup><mi>s</mi><mrow><mn>1</mn><mo>−</mo><mi>λ</mi></mrow></msup><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mo>≈</mo><mi>C</mi><mspace width="0.1667em"></mspace><msup><mi>s</mi><mrow><mo lspace="0em" rspace="0em">−</mo><mi>λ</mi></mrow></msup></mrow></math> </p>
+<p>At the edge’s thin layer, the outward carrying and back-diffusion is balanced, thus the net flux of the tracer is zero. As s increases inward: </p>
+<p><math display="block" style="display:block math;"><mrow><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mspace width="0.1667em"></mspace><mi>c</mi><mo>=</mo><mo form="prefix" stretchy="false">−</mo><msub><mi>D</mi><mi>i</mi></msub><mspace width="0.1667em"></mspace><mfrac><mrow><mi>d</mi><mi>c</mi></mrow><mrow><mi>d</mi><mi>s</mi></mrow></mfrac><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mfrac><mrow><mi>d</mi><mi>c</mi></mrow><mi>c</mi></mfrac><mo>=</mo><mo form="prefix" stretchy="false">−</mo><mfrac><mi>C</mi><msub><mi>D</mi><mi>i</mi></msub></mfrac><mspace width="0.1667em"></mspace><msup><mi>s</mi><mrow><mo lspace="0em" rspace="0em">−</mo><mi>λ</mi></mrow></msup><mspace width="0.1667em"></mspace><mi>d</mi><mi>s</mi><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mi>c</mi><mo>∝</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mrow><mo fence="true" form="prefix">[</mo><mo>−</mo><mfrac><mrow><mi>C</mi><mspace width="0.1667em"></mspace><msup><mi>s</mi><mrow><mn>1</mn><mo>−</mo><mi>λ</mi></mrow></msup></mrow><mrow><msub><mi>D</mi><mi>i</mi></msub><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></mfrac><mo fence="true" form="postfix">]</mo></mrow></mrow></math> </p>
+<p>Thus, the tracer concentration falls off as the distance from the edge increases. The ring’s width is then defined as the distance where the exponent reaches 1; this gives w<sub>diff</sub>.</p>
+</details>
+For our droplets, this predicts a ring about 5 µm. This is 120 times narrower than the rings measured during tested, indicating that there is something limiting how narrow the band can be.<p>As mentioned earlier, the ring formed during drying cannot be narrower than the space needed to hold the solid delivered to it. If that sollid packs in to a annulus (ring shape formed by the edges of two concentric circles), with a circumference 2πR, with a width w (r<sub>2</sub> - r<sub>1</sub>) and thickness of δ<sub>ring</sub> (Popov, 2005):  </p>
+<p>Setting the material that needs to be delivered equal to the annulus’ capacity, and solving for w: </p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>w</mi><mtext>pack</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>ϕ</mi><mn>0</mn></msub><mspace width="0.1667em"></mspace><mi>η</mi><mspace width="0.1667em"></mspace><msub><mi>V</mi><mn>0</mn></msub></mrow><mrow><mn>2</mn><mi>π</mi><mi>R</mi><mspace width="0.1667em"></mspace><msub><mi>δ</mi><mtext>ring</mtext></msub><mspace width="0.1667em"></mspace><msub><mi>ϕ</mi><mtext>rcp</mtext></msub></mrow></mfrac></mrow></math> </p>
+<ul>
+	<li> φ₀ is the solid volume fraction of the droplet. For the specific volume of BSA at .733ml/g, we use φ₀ = 0.030. This corresponds to ~4.1-4.5% of BSA in the droplet. It is important to know that pure blood has a solid content 15 times greater than this. </li><li> At that level, the packing-limited width would exceed the droplet’s radius, so the deposit would fill the whole spot and concentrate almost nothing. Blood would therefore need to be diluted or have its cells removed before plating, which is the reason for modeling and testing a dilute protein phantom. </li><li> this phenomena is shown in a 9% v/v BSA droplet, where the high protein content causes the ring width to exceed possible limits, forming an almost uniform deposit with no ring: 
+(insiert picture)</li><li> φ~rcp~ = 0.64 is the fraction of space filled by randomly packed solid (Scott &amp; Kilgour, 1969). </li><li> δ~ring~ is the dry ring's thickness, estimated at 20 µm
+	</li><li> η is the fraction of solid content delivered to the ring, below. </li>
+</ul><p>Whichever width is larger between diffusion-limited and packing-limited, is the number that the model takes and compares against the measured:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>w</mi><mo>=</mo><mrow><mi>max</mi><mo>⁡</mo></mrow><mo form="prefix" stretchy="false">(</mo><msub><mi>w</mi><mtext>diff</mtext></msub><mo separator="true">,</mo><mspace width="0.1667em"></mspace><msub><mi>w</mi><mtext>pack</mtext></msub><mo form="postfix" stretchy="false">)</mo></mrow></math><br>This is typically packing-limited due to the protein-rich droplets being used, often by a larger margin. The ring ends up being quite wide compared to the total area of the deposit. </p>
+<p>When flow into the ring dominates, any tracer that begins outside the “launch radius” reaches the edge/ring before stopping time t*. Thus, η is determined by how long flow outwards carries tracer before the deposit settles, not by how much the ring itself can hold.  Integration of the droplet’s starting tracer distribution: </p>
+<p><math display="block" style="display:block math;"><mrow><mi>η</mi><mo>=</mo><msup><mrow><mo fence="true" form="prefix">[</mo><mn>1</mn><mo>−</mo><msup><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><msup><mi>t</mi><mo>*</mo></msup><msub><mi>t</mi><mi>f</mi></msub></mfrac><mo fence="true" form="postfix">)</mo></mrow><mrow><mn>3</mn><mi>/</mi><mn>4</mn></mrow></msup><mo fence="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mrow></math> </p>
+<p>η  depends on the drying time, so most of the uncertainty comes from the difference in true drying vs line arrest. t*/t<sub>f!</sub> was estimated around .92, which gives η = .722, similar to the measured ~.7± .02. </p>
+<details> <summary>Derivation 7: delivery fraction η</summary> <p>Near the center, flow speed grows in proportion to r. Using the previous formula h<sub>c</sub> = 2V/(πR² ), a particle moves outward given by:<br><math display="block" style="display:block math;"><mrow><mover><mi>u</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">‾</mo></mover><mo>≈</mo><mfrac><mrow><mn>3</mn><mi>Q</mi><mspace width="0.1667em"></mspace><mi>r</mi></mrow><mrow><mn>4</mn><mi>π</mi><msup><mi>R</mi><mn>2</mn></msup><msub><mi>h</mi><mi>c</mi></msub></mrow></mfrac><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mfrac><mrow><mi>d</mi><mi>r</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>3</mn><mi>Q</mi><mspace width="0.1667em"></mspace><mi>r</mi></mrow><mrow><mn>8</mn><mi>V</mi></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mi>V</mi><mo>=</mo><msub><mi>V</mi><mn>0</mn></msub><mo>−</mo><mi>Q</mi><mi>t</mi></mrow></math> </p>
+<p><math display="block" style="display:block math;"><mrow><mo movablelimits="false">∫</mo><mfrac><mrow><mi>d</mi><mi>r</mi></mrow><mi>r</mi></mfrac><mo>=</mo><mfrac><mn>3</mn><mn>8</mn></mfrac><mo movablelimits="false">∫</mo><mfrac><mrow><mi>Q</mi><mspace width="0.1667em"></mspace><mi>d</mi><mi>t</mi></mrow><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>−</mo><mi>Q</mi><mi>t</mi></mrow></mfrac><mspace width="1em"></mspace><mo stretchy="false">⇒</mo><mspace width="1em"></mspace><mi>r</mi><mo>∝</mo><msup><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><mi>t</mi><msub><mi>t</mi><mi>f</mi></msub></mfrac><mo fence="true" form="postfix">)</mo></mrow><mrow><mo lspace="0em" rspace="0em">−</mo><mn>3</mn><mi>/</mi><mn>8</mn></mrow></msup></mrow></math> </p>
+<p>Thus, as the droplet thins, particles speed up, described as the “rush hour” in coffee-ring flow studies (Marín et al., 2011). Given a particle that starts at radius α of R, ir reaches the edge exactly at t* assuming that α = = (1 − t*/t<sub>f</sub>)<sup>(3/8)</sup>. The tracer spreads in proportion to the height of the film, so the fraction that starts outside of the given α is: </p>
+<p><math display="block" style="display:block math;"><mrow><mi>η</mi><mo>=</mo><mfrac><mrow><msubsup><mo movablelimits="false">∫</mo><mi>α</mi><mn>1</mn></msubsup><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>−</mo><msup><mi>x</mi><mn>2</mn></msup><mo form="postfix" stretchy="false">)</mo><mspace width="0.1667em"></mspace><mi>x</mi><mspace width="0.1667em"></mspace><mi>d</mi><mi>x</mi></mrow><mrow><msubsup><mo movablelimits="false">∫</mo><mn>0</mn><mn>1</mn></msubsup><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>−</mo><msup><mi>x</mi><mn>2</mn></msup><mo form="postfix" stretchy="false">)</mo><mspace width="0.1667em"></mspace><mi>x</mi><mspace width="0.1667em"></mspace><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><msup><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>α</mi><mn>2</mn></msup><mo fence="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo separator="true">,</mo><mspace width="2em"></mspace><msup><mi>α</mi><mn>2</mn></msup><mo>=</mo><msup><mrow><mo fence="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><msup><mi>t</mi><mo>*</mo></msup><msub><mi>t</mi><mi>f</mi></msub></mfrac><mo fence="true" form="postfix">)</mo></mrow><mrow><mn>3</mn><mi>/</mi><mn>4</mn></mrow></msup></mrow></math> </p>
+<p>Using the flow from the center all through out the droplet is a reasonable approximation when Pe &gt;&gt; 1. </p>
+</details> <h4>Validity</h4>
+<p>The model assumes that the tracer stays mixed evenly throughout the droplet, measured by an interfacial Peclet number ε²Pe. This represents the vertical (top-down) Peclet number h_c²/(t_f D_i) of Routh &amp; Zimmerman (2004) . </p>
+<p>t*/t<sub>f</sub> and δ<sub>ring</sub> are estimates; t*/tf, and are not fitted to each specific droplet, meaning that the value of each variable can vary. Specifically for δ<sub>ring</sub>, the thickness is estimated by the amount of protein required to stack within a specific area of a ring. The team currently has no method of measuring and verifying this specific value as an assumption, but it is given as a reasonable approximation. With the lack of specificity between droplets, the measured vs predicted ring fraction and CF is a genuine, end to end test to comparison. </p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Baseline value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>D<sub>i</sub>, Stokes–Einstein</td>
+<td>2.1 × 10⁻¹¹ m²/s</td>
+</tr>
+<tr>
+<td>U = R/t<sub>f</sub></td>
+<td>1.10 µm/s</td>
+</tr>
+<tr>
+<td>Pe = R²/(t<sub>f</sub> D<sub>i</sub>)</td>
+<td>123</td>
+</tr>
+<tr>
+<td>λ at θ₀ = 27.7°</td>
+<td>0.409</td>
+</tr>
+<tr>
+<td>Q = V₀/t<sub>f</sub></td>
+<td>2.35 × 10⁻¹² m³/s</td>
+</tr>
+<tr>
+<td>w<sub>diff</sub></td>
+<td>4.7 µm</td>
+</tr>
+<tr>
+<td>t*/t<sub>f</sub> (estimated)</td>
+<td>0.92</td>
+</tr>
+<tr>
+<td>η (measured f<sub>ring</sub>: 0.700 ± 0.019)</td>
+<td>0.722</td>
+</tr>
+<tr>
+<td>φ₀</td>
+<td>0.030</td>
+</tr>
+<tr>
+<td>δ<sub>ring</sub> (estimated)</td>
+<td>20 µm</td>
+</tr>
+<tr>
+<td>w<sub>pack</sub></td>
+<td>578 µm</td>
+</tr>
+<tr>
+<td>w = max(w<sub>diff</sub>, w<sub>pack</sub>)</td>
+<td>578 µm: packing governs, 122× wider</td>
+</tr>
+</tbody></table>
+
+</div><div class="section-block">
+<h4>Predicting CF _ring</h4>
+<p>Using the width of the ring and the delivery fraction derived and calculated above, the areal concentration factor CF<sub>ring</sub> can be determined. This is the number that can be measured and compared across droplet and conditions as an indicator of ring performance. </p>
+<p>CF<sub>dry</sub> compares how densely the tracer is packed in the ring by comparing the fraction of tracer delivered wiht the width that the tracer must fit within. </p>
+<p><math display="block" style="display:block math;"><mrow><msub><mrow><mtext></mtext><mi>CF</mi></mrow><mtext>dry</mtext></msub><mo>=</mo><mfrac><mi>η</mi><mrow><msub><mi>A</mi><mtext>ring</mtext></msub><mi>/</mi><msub><mi>A</mi><mtext>spot</mtext></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>η</mi><mspace width="0.1667em"></mspace><msup><mi>R</mi><mn>2</mn></msup></mrow><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>−</mo><mo form="prefix" stretchy="false">(</mo><mi>R</mi><mo>−</mo><mi>w</mi><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow></math> </p>
+<p>The image analysis that was used to analyze the ring formation represents this same quantity, by doing the same comparison but with pixel brightness rather than particle delivery. A very thin ring that holds little tracer can score highly, so η, w, and CF<sub>dry</sub> are always reported alongside eachother. </p>
+<p>For a thin ring, A_ring ≈ 2πRw, so CF_dry ≈ ηR/(2w). Due to tested droplets being packing-limited, substitute w~pack from previous derivations: </p>
+<p><math display="block" style="display:block math;"><mrow><msub><mrow><mtext></mtext><mi>CF</mi></mrow><mtext>dry</mtext></msub><mo>≈</mo><mfrac><mrow><mi>π</mi><msup><mi>R</mi><mn>2</mn></msup><mspace width="0.1667em"></mspace><msub><mi>δ</mi><mtext>ring</mtext></msub><mspace width="0.1667em"></mspace><msub><mi>ϕ</mi><mtext>rcp</mtext></msub></mrow><mrow><msub><mi>ϕ</mi><mn>0</mn></msub><mspace width="0.1667em"></mspace><msub><mi>V</mi><mn>0</mn></msub></mrow></mfrac></mrow></math> </p>
+<p>As mentioned earlier, δ<sub>ring</sub> is the one caveat that has not been measured directly, and a ring’s dry thickness may chance with droplet and recipe. </p>
+<p>CF<sub>dry</sub> is an important metric to measure; Concentrating moves tracer into a smaller area, thus helping detection as it raises local pfLDH and LOCKR signal concentrations to be easier to detect. </p>
+<p>For the baseline example:</p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Baseline value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A<sub>ring</sub> = π[R² − (R − w)²]</td>
+<td>7.41 mm²</td>
+</tr>
+<tr>
+<td>A<sub>spot</sub> = πR²</td>
+<td>17.1 mm²</td>
+</tr>
+<tr>
+<td>Fraction of the spot the ring covers</td>
+<td>0.43</td>
+</tr>
+<tr>
+<td>CF<sub>dry</sub> = η / 0.43</td>
+<td>1.66</td>
+</tr>
+<tr>
+<td>Thin-ring approximation ηR/(2w)</td>
+<td>1.46</td>
+</tr>
+<tr>
+<td>Measured CF (mean of 4, ± 1 SD)</td>
+<td>1.745 ± 0.075</td>
+</tr>
+</tbody></table>
+
+</div><div class="section-block">
+<h4>Experimental Protocol</h4>
+<h5>Solution Preparation</h5>
+<p>20 µL total, in a 1.5 mL tube. Example solution (the baseline used for testing, see Mixture testing):</p>
+<ul>
+<li>10 µL of 9% BSA stock</li>
+<li>2 µL of 1% saponin stock</li>
+<li>2 µL of 0.2% Tween stock</li>
+<li>4 µL of 0.01% microsphere stock</li>
+<li>2 µL of PBS</li>
+</ul>
+<h5>Slide Preparation</h5>
+<ol>
+<li>Select a number of glass slides equal to the number of solutions being tested.</li>
+<li>Clean each slide thoroughly with isopropyl alcohol (IPA).</li>
+<li>Wipe with a lint-free KimTech wipe to remove any remaining residue.</li>
+<li>Allow the slides to dry completely before applying samples.</li>
+</ol>
+<h5>Droplet Deposition</h5>
+<ol>
+<li>Using a micropipette, take 5 µL from a pre-made 20 µL solution and dispense it onto a clean glass slide.</li>
+<li>Repeat until 4 droplets have been deposited per slide, spacing them far enough apart that they cannot merge and each dries independently.</li>
+</ol>
+
+</div><div class="section-block">
+<h4>Droplet Imaging</h4>
+<h5>Camera positioning</h5>
+<ul>
+<li>Position the camera (Canon EOS 90D) directly above the drying area so that the entire slide with the droplets is in the camera's field of view.</li>
+<li>Make sure it gives a clear, consistent view of the drying region to allow the best possible analysis later on.</li>
+</ul>
+<h5>Time-lapse recording</h5>
+<ul>
+<li>Position an appropriate recording device to capture a time-lapse of the drying process at one frame per minute.</li>
+<li>This documents the progression of evaporation and drying of the droplets over time.</li>
+</ul>
+<h5>Macro lens</h5>
+<ul>
+<li>Attach a macro lens (Canon EF 100mm f/2.8) to the camera to enable high-resolution imaging of the droplets.</li>
+<li>This allows more accurate observation and analysis of their physical characteristics.</li>
+</ul>
+<h5>Final UV imaging</h5>
+<ul>
+<li>Once all of the droplets have dried, perform the final imaging in a completely dark room to prevent any interference from ambient lighting.</li>
+<li>Illuminate each droplet with a 365 nm ultraviolet light source, and photograph each droplet individually.</li>
+<li>Each droplet should be captured separately from all the others for subsequent analysis.</li>
+<li>At each imaging session, use a caliper to measure 5 mm and photograph it to set the image scale later.</li>
+</ul>
+
+</div><div class="section-block">
+<h4>Image Analysis</h4>
+<p>Once imaged, the pictures of the droplets were analyzed in ImageJ, a free, open-source image processing program designed for scientific analysis (Schneider et al., 2012). A custom macro gave statistics about each droplet and the ring it formed. The user and macro did the following:</p>
+<h5>User Steps</h5>
+<ol>
+<li><strong>RAW conversion:</strong> RAW files were converted to 32-bit TIFF files without gamma correction, with unity white balance and no auto-brightening. This keeps pixel brightness proportional to the actual light collected by the camera, which JPEGs do not.</li>
+<li><strong>Channel isolation:</strong> Because the emission of our microspheres peaks at 415 nm (a deep blue-violet), the blue channel was isolated so that only the spread of the tracer is analyzed, rather than other things in the droplet (like the red in our faux blood).</li>
+</ol>
+<h5>Macro steps</h5>
+<ol start="3">
+<li><strong>Saturation checks:</strong> Any droplet with pixels at the sensor's maximum in the ring was discarded, as rings that don't include their brightest pixels will have an artificially low reading.</li>
+<li><strong>Radial profile:</strong> The user draws a circle over the droplet, leaving a reasonable amount of blank space between the circle and the edge of the deposit. The macro then averages intensity in 200 concentric rings around its centre, giving the intensity as a function of radius, I(r).</li>
+<li><strong>Ring edges:</strong> The ring's inner and outer edges, r₁ and r₂, are taken where intensity falls below half-max on either side, so the ring width is w = r₂ − r₁. The absolute outer edge of the droplet, <em>R</em>, is taken as the radius where intensity falls below 10% of the peak.</li>
+<li><strong>Metrics:</strong> The macro then reports the tracer delivery and the concentration density relative to a theoretical uniform (spread-out) droplet.</li>
+</ol>
+<h5>Ring Metrics</h5>
+<p>f<sub>ring</sub> measures the tracer delivery within the ring:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mi>f</mi><mtext>ring</mtext></msub><mo>=</mo><mfrac><mrow><munder><mo movablelimits="false">∑</mo><mtext>within ring</mtext></munder><mi>r</mi><mspace width="0.1667em"></mspace><mi>I</mi><mo form="prefix" stretchy="false">(</mo><mi>r</mi><mo form="postfix" stretchy="false">)</mo></mrow><mrow><munder><mo movablelimits="false">∑</mo><mtext>whole deposit</mtext></munder><mi>r</mi><mspace width="0.1667em"></mspace><mi>I</mi><mo form="prefix" stretchy="false">(</mo><mi>r</mi><mo form="postfix" stretchy="false">)</mo></mrow></mfrac></mrow></math></p>
+<p>It is the ratio of the tracer signal within the ring to the signal across the entire deposit. An f<sub>ring</sub> of 1 represents a ring with no tracer elsewhere in the deposit (though the band can still be immensely wide).</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mrow><mtext></mtext><mi>CF</mi></mrow><mtext>ring</mtext></msub><mo>=</mo><msub><mi>f</mi><mtext>ring</mtext></msub><mspace width="0.1667em"></mspace><mfrac><msup><mi>R</mi><mn>2</mn></msup><mrow><msubsup><mi>r</mi><mn>2</mn><mn>2</mn></msubsup><mo>−</mo><msubsup><mi>r</mi><mn>1</mn><mn>2</mn></msubsup></mrow></mfrac></mrow></math></p>
+<p>This equation takes the fraction of the tracer in the ring and divides it by the fraction of the deposit that the ring covers. A CF value of 1 indicates that the droplet did not concentrate at all. For example, a working ring where 70% of the tracer is within the ring, and the ring covers 40% of the deposit, gives a CF of 1.75.</p>
+<p>The optimal ring therefore has high tracer delivery and is thin: a truly highly concentrated droplet. However, an artificially thin ring (for example, if the ring-edge threshold were set to 75% of the maximum intensity) would produce inaccurate results that don't represent the true concentration of that droplet. </p>
+
+</div><div class="section-block">
+<h4>Validation</h4>
+<p>Following the methods above, 32 droplets were tested against the model’s predictions within the chamber. They were tested in 11 different conditions spanning a range of temperatures from“23 °C to 31 °C , and a humidity range of 36%–87%. The reason why this range does not cover the full reported range of the regions desired to test is due to using yearly averages rather than seasonal averages, along with in-built hardware limitations. This centers the model’s validation around standard cases of humidity and temperature rather than absolute maximums, making it more reliable for those cases. For extreme conditions, like peak-dry season and monsoon-level humidity, the model has to extrapolate.</p>
+<p>To calculate predicted scores and times for a droplet and the condition it was tested in, the equations derived from the Model were built into a spreadsheet. Every prediction comes from the physics and assumed constants, with no droplet-specific fitting, save for the radius of the droplet. A radial profile was produced by the ImageJ macro and saved as a sheet of data, which could be pasted into the calculator, and the calculator automatically finds r<sub>1</sub>, r<sub>2</sub>, w, R, f<sub>ring</sub>, and CF<sub>ring</sub>.<br>	<br>The by-droplet conditions are meant to be manually input into the calculator. This includes: </p>
+<ul>
+<li>Temperature and relative humidity</li>
+<li>Plated V<sub>0</sub> (Held at 5µL for all droplets)</li>
+<li>Contact radius R: Read automatically from the deposit’s radial intensity profile</li>
+<li>Dried in chamber or on an open bench: Selects whether the measured Sherwood number is applied.</li>
+</ul>
+<p>The contact angle is never meant to be manually put into the calculator. It is always derived from the radius R and V<sub>0</sub> (Derivation 1). Physical constants (Sh, t*/t<sub>f</sub>, δ<sub>ring</sub> , etc.) are entered once as an assumption/measurement, and every calculation follows those inputs. </p>
+<p>The constants used follow as such:</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+<th>Origin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sherwood number Sh</td>
+<td>1.65</td>
+<td>Measured in 5 trials, open bench against chamber (see Hardware)</td>
+</tr>
+<tr>
+<td>t*/t<sub>f</sub></td>
+<td>0.92</td>
+<td>Estimated based off testing</td>
+</tr>
+<tr>
+<td>δ<sub>ring</sub></td>
+<td>20 µm</td>
+<td>Estimated in advance</td>
+</tr>
+<tr>
+<td>φ₀</td>
+<td>0.030</td>
+<td>Recipe</td>
+</tr>
+<tr>
+<td>φ<sub>rcp</sub></td>
+<td>0.64</td>
+<td>Scott &amp; Kilgour (1969)</td>
+</tr>
+<tr>
+<td>D<sub>i</sub></td>
+<td>6.0 × 10⁻¹¹ m²/s</td>
+<td>Entered value; affects Pe and w<sub>diff</sub> only</td>
+</tr>
+</tbody></table>
+<p>Each step of the model process is split into different tabs. </p>
+<h5>Calculator Description</h5>
+<ul>
+<li>Profile: This tab is where the radial profile from the macro is pasted. The calculator then finds the actual/measured ring edges, ring width, delivery fraction, and the concentration factor. </li>
+<li>Evaporation: This includes droplet geometry, vapor density, evaporation rate, drying time, etc. </li>
+<li>Transport: This tab calculates Péclet numbers, ring widths, plus the delivery and concentration factors</li>
+<li>Measured vs Predicted: Compares the predicted values from the previous two tabs with the measured values derived from the profile. </li>
+<li>Droplet Log: This delivers the numbers from the active profiles for the user to confirm and put down as one of the droplets tested.  </li>
+<li>Log Summary: This tab takes the data in the droplet log and provides statistics. </li>
+<li>Note: There is a rehydration tab, based on previous revisions of the Model. However, this tab is disregarded and not used for this analysis.</li>
+</ul>
+<h5>Specific Design</h5>
+<ul>
+<li>End-to-end predictions: A droplet’s prediction is solely based on the model, save for the radius. No other information about the droplet is used in its own prediction. </li>
+<li>Constants are consistent across all droplets: If a constant is updated, then all previously calculated values are updated. </li>
+<li>Misses in predictions are traced back to what caused the biggest difference. For example, if the gap between the predicted width and measured width is larger than the gap between the predicted and measured, then the cause of error is traced back to the width, otherwise it is traced to delivery. This shows what part of the model is inaccurate, comparatively.</li>
+</ul>
+<h4>Results</h4>
+<p>Using the calculator and our measured droplets, the following data was produced:</p>
+<details>
+<summary>Droplet log: all 32 droplets (click to expand)</summary><table>
+<thead>
+<tr>
+<th>Droplet</th>
+<th>Session</th>
+<th>T (°C)</th>
+<th>RH</th>
+<th>R (mm)</th>
+<th>Arrest, measured (min)</th>
+<th>t*, predicted (min)</th>
+<th>f<sub>ring</sub></th>
+<th>w, measured (µm)</th>
+<th>w, predicted (µm)</th>
+<th>CF, measured</th>
+<th>CF, predicted</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ET01</td>
+<td>1</td>
+<td>24.1</td>
+<td>0.46</td>
+<td>2.22</td>
+<td>14</td>
+<td>16.2</td>
+<td>0.74</td>
+<td>725</td>
+<td>607</td>
+<td>1.43</td>
+<td>1.53</td>
+</tr>
+<tr>
+<td>ET02</td>
+<td>1</td>
+<td>24.1</td>
+<td>0.46</td>
+<td>2.53</td>
+<td>14</td>
+<td>14.7</td>
+<td>0.74</td>
+<td>826</td>
+<td>532</td>
+<td>1.44</td>
+<td>1.92</td>
+</tr>
+<tr>
+<td>ET03</td>
+<td>1</td>
+<td>24.1</td>
+<td>0.46</td>
+<td>2.36</td>
+<td>14</td>
+<td>15.5</td>
+<td>0.76</td>
+<td>855</td>
+<td>570</td>
+<td>1.33</td>
+<td>1.70</td>
+</tr>
+<tr>
+<td>ET04</td>
+<td>1</td>
+<td>25</td>
+<td>0.70</td>
+<td>2.08</td>
+<td>24</td>
+<td>29.0</td>
+<td>0.75</td>
+<td>726</td>
+<td>647</td>
+<td>1.44</td>
+<td>1.38</td>
+</tr>
+<tr>
+<td>ET05</td>
+<td>1</td>
+<td>25</td>
+<td>0.70</td>
+<td>2.06</td>
+<td>24</td>
+<td>29.2</td>
+<td>0.66</td>
+<td>523</td>
+<td>655</td>
+<td>1.63</td>
+<td>1.35</td>
+</tr>
+<tr>
+<td>ET06</td>
+<td>1</td>
+<td>25</td>
+<td>0.70</td>
+<td>2.13</td>
+<td>24</td>
+<td>28.6</td>
+<td>0.64</td>
+<td>483</td>
+<td>633</td>
+<td>1.78</td>
+<td>1.43</td>
+</tr>
+<tr>
+<td>ET07</td>
+<td>1</td>
+<td>25</td>
+<td>0.70</td>
+<td>1.98</td>
+<td>24</td>
+<td>29.8</td>
+<td>0.65</td>
+<td>437</td>
+<td>681</td>
+<td>1.80</td>
+<td>1.27</td>
+</tr>
+<tr>
+<td>ET08</td>
+<td>1</td>
+<td>29</td>
+<td>0.40</td>
+<td>1.88</td>
+<td>10</td>
+<td>11.9</td>
+<td>0.71</td>
+<td>615</td>
+<td>715</td>
+<td>1.44</td>
+<td>1.17</td>
+</tr>
+<tr>
+<td>ET09</td>
+<td>1</td>
+<td>29</td>
+<td>0.40</td>
+<td>1.77</td>
+<td>10</td>
+<td>12.2</td>
+<td>0.63</td>
+<td>391</td>
+<td>761</td>
+<td>1.76</td>
+<td>1.07</td>
+</tr>
+<tr>
+<td>ET10</td>
+<td>1</td>
+<td>29</td>
+<td>0.40</td>
+<td>1.78</td>
+<td>10</td>
+<td>12.1</td>
+<td>0.66</td>
+<td>416</td>
+<td>755</td>
+<td>1.76</td>
+<td>1.08</td>
+</tr>
+<tr>
+<td>ET11</td>
+<td>2</td>
+<td>29</td>
+<td>0.70</td>
+<td>1.95</td>
+<td>19</td>
+<td>23.7</td>
+<td>0.77</td>
+<td>783</td>
+<td>692</td>
+<td>1.30</td>
+<td>1.23</td>
+</tr>
+<tr>
+<td>ET12</td>
+<td>2</td>
+<td>29</td>
+<td>0.70</td>
+<td>1.98</td>
+<td>19</td>
+<td>23.5</td>
+<td>0.84</td>
+<td>962</td>
+<td>680</td>
+<td>1.21</td>
+<td>1.27</td>
+</tr>
+<tr>
+<td>ET13</td>
+<td>2</td>
+<td>29</td>
+<td>0.70</td>
+<td>1.85</td>
+<td>19</td>
+<td>24.2</td>
+<td>0.85</td>
+<td>909</td>
+<td>729</td>
+<td>1.21</td>
+<td>1.14</td>
+</tr>
+<tr>
+<td>ET14</td>
+<td>2</td>
+<td>27</td>
+<td>0.50</td>
+<td>2.04</td>
+<td>14</td>
+<td>15.5</td>
+<td>0.73</td>
+<td>650</td>
+<td>659</td>
+<td>1.44</td>
+<td>1.33</td>
+</tr>
+<tr>
+<td>ET15</td>
+<td>2</td>
+<td>27</td>
+<td>0.50</td>
+<td>2.23</td>
+<td>14</td>
+<td>14.7</td>
+<td>0.75</td>
+<td>659</td>
+<td>605</td>
+<td>1.58</td>
+<td>1.54</td>
+</tr>
+<tr>
+<td>ET16</td>
+<td>2</td>
+<td>27</td>
+<td>0.50</td>
+<td>2.03</td>
+<td>14</td>
+<td>15.6</td>
+<td>0.75</td>
+<td>690</td>
+<td>664</td>
+<td>1.42</td>
+<td>1.32</td>
+</tr>
+<tr>
+<td>ET17</td>
+<td>2</td>
+<td>27</td>
+<td>0.50</td>
+<td>1.99</td>
+<td>14</td>
+<td>15.7</td>
+<td>0.71</td>
+<td>590</td>
+<td>677</td>
+<td>1.46</td>
+<td>1.28</td>
+</tr>
+<tr>
+<td>ET18</td>
+<td>2</td>
+<td>23</td>
+<td>0.50</td>
+<td>2.04</td>
+<td>17</td>
+<td>19.8</td>
+<td>0.63</td>
+<td>452</td>
+<td>661</td>
+<td>1.77</td>
+<td>1.33</td>
+</tr>
+<tr>
+<td>ET19</td>
+<td>2</td>
+<td>23</td>
+<td>0.50</td>
+<td>1.77</td>
+<td>17</td>
+<td>20.9</td>
+<td>0.68</td>
+<td>416</td>
+<td>761</td>
+<td>1.73</td>
+<td>1.07</td>
+</tr>
+<tr>
+<td>ET20</td>
+<td>2</td>
+<td>23</td>
+<td>0.50</td>
+<td>1.85</td>
+<td>17</td>
+<td>20.6</td>
+<td>0.67</td>
+<td>408</td>
+<td>729</td>
+<td>1.84</td>
+<td>1.14</td>
+</tr>
+<tr>
+<td>ET21</td>
+<td>2</td>
+<td>24</td>
+<td>0.85</td>
+<td>2.29</td>
+<td>53</td>
+<td>58.9</td>
+<td>0.71</td>
+<td>693</td>
+<td>588</td>
+<td>1.50</td>
+<td>1.61</td>
+</tr>
+<tr>
+<td>ET22</td>
+<td>2</td>
+<td>24</td>
+<td>0.85</td>
+<td>2.17</td>
+<td>53</td>
+<td>61.2</td>
+<td>0.68</td>
+<td>563</td>
+<td>621</td>
+<td>1.63</td>
+<td>1.47</td>
+</tr>
+<tr>
+<td>ET23</td>
+<td>3</td>
+<td>27.6</td>
+<td>0.63</td>
+<td>2.37</td>
+<td>14</td>
+<td>18.4</td>
+<td>0.84</td>
+<td>1198</td>
+<td>568</td>
+<td>1.25</td>
+<td>1.71</td>
+</tr>
+<tr>
+<td>ET24</td>
+<td>3</td>
+<td>27.6</td>
+<td>0.63</td>
+<td>2.25</td>
+<td>14</td>
+<td>19.1</td>
+<td>0.75</td>
+<td>846</td>
+<td>598</td>
+<td>1.32</td>
+<td>1.57</td>
+</tr>
+<tr>
+<td>ET25</td>
+<td>3</td>
+<td>27.6</td>
+<td>0.63</td>
+<td>2.40</td>
+<td>14</td>
+<td>18.2</td>
+<td>0.83</td>
+<td>1157</td>
+<td>562</td>
+<td>1.23</td>
+<td>1.74</td>
+</tr>
+<tr>
+<td>ET26</td>
+<td>3</td>
+<td>31</td>
+<td>0.36</td>
+<td>2.50</td>
+<td>10</td>
+<td>8.3</td>
+<td>0.80</td>
+<td>1064</td>
+<td>540</td>
+<td>1.31</td>
+<td>1.87</td>
+</tr>
+<tr>
+<td>ET27</td>
+<td>3</td>
+<td>31</td>
+<td>0.36</td>
+<td>2.30</td>
+<td>10</td>
+<td>8.9</td>
+<td>0.79</td>
+<td>933</td>
+<td>585</td>
+<td>1.30</td>
+<td>1.63</td>
+</tr>
+<tr>
+<td>ET28</td>
+<td>3</td>
+<td>31</td>
+<td>0.36</td>
+<td>2.33</td>
+<td>10</td>
+<td>8.8</td>
+<td>0.76</td>
+<td>927</td>
+<td>578</td>
+<td>1.30</td>
+<td>1.66</td>
+</tr>
+<tr>
+<td>ET29</td>
+<td>4</td>
+<td>31</td>
+<td>0.82</td>
+<td>2.13</td>
+<td>42</td>
+<td>33.8</td>
+<td>0.73</td>
+<td>487</td>
+<td>631</td>
+<td>1.56</td>
+<td>1.43</td>
+</tr>
+<tr>
+<td>ET30</td>
+<td>4</td>
+<td>31</td>
+<td>0.82</td>
+<td>2.05</td>
+<td>42</td>
+<td>34.7</td>
+<td>0.76</td>
+<td>552</td>
+<td>657</td>
+<td>1.62</td>
+<td>1.34</td>
+</tr>
+<tr>
+<td>ET31</td>
+<td>4</td>
+<td>25</td>
+<td>0.87</td>
+<td>2.00</td>
+<td>57</td>
+<td>70.0</td>
+<td>0.70</td>
+<td>560</td>
+<td>674</td>
+<td>1.43</td>
+<td>1.29</td>
+</tr>
+<tr>
+<td>ET32</td>
+<td>4</td>
+<td>25</td>
+<td>0.87</td>
+<td>2.02</td>
+<td>57</td>
+<td>69.7</td>
+<td>0.74</td>
+<td>483</td>
+<td>668</td>
+<td>1.47</td>
+<td>1.31</td>
+</tr>
+</tbody></table>
+<p>Predicted delivery fraction η = 0.722 for every droplet, since it depends only on t*/t<sub>f</sub> = 0.92. Arrest time was recorded once per condition. </p>
+</details>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig06-validation-scorecard.avif" alt="Model performance across 32 droplets. Error bars are 95% confidence intervals. Graph generated by  Claude based on recorded data and analysis." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Model performance across 32 droplets. Error bars are 95% confidence intervals. Graph generated by  Claude based on recorded data and analysis.</p>
+<p>The values of t*/t<sub>f</sub> and δ<sub>ring</sub> estimated beforehand are close to the averages implied by these same droplets (0.922 and 20.3 µm), so the average levels of η and CF are effectively set by this data. The strongest tests are therefore drying time, which uses no estimated constant beyond the separately measured Sh, and whether the model follows the differences between droplets.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Result</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Drying time</td>
+<td>Predicted t* follows measured arrest across 10–57 min (r = 0.97); mean error 16.4%, with arrest about 10.6% earlier than predicted</td>
+<td>Validated</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>Measured f<sub>ring</sub> = 0.73 ± 0.06 against predicted η = 0.72; mean error 7.1%</td>
+<td>Consistent</td>
+</tr>
+<tr>
+<td>Ring width</td>
+<td>Average measured/predicted ratio 1.05, but r = −0.66: measured rings widened on larger spots while predicted rings narrowed</td>
+<td>Right on average, incorrect trend</td>
+</tr>
+<tr>
+<td>CF</td>
+<td>Mean error 22.4%; 69% of droplets within ±25%, 89% within ±50%; r = −0.48</td>
+<td>Same as w; correct averages, wrong trend</td>
+</tr>
+</tbody></table>
+<p>Analyzing these results, the following is shown:</p>
+<h5>Drying Time</h5>
+<p>The modeling for the time it takes a given droplet to dry is validated. Across a wide range of times, from 10 minutes at 31c and 36% to 57 minutes at 87% RH at 25c, the model predicted times with a mean error of 16.4%. Though a modifier was added to the raw predicted times in the form of the Sherwood number, this number was tested across multiple trials, and fits within a sensible range. The sherwood number depends on chamber airflow, rather than temperature or humidity, so using this number across conditions is valid. This is shown in the spread of the predicted vs measured times, with a correlation of r = 0.97. </p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig07-drying-time.avif" alt="Predicted vs measured drying time, and the error for each test condition. Graph generated by  Claude based on recorded data and analysis." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Predicted vs measured drying time, and the error for each test condition. Graph generated by  Claude based on recorded data and analysis.</p>
+<p>However, it is important to note that a back calculation of the difference in measured time and the raw predicted time gives a Sherwood number of 1.88, which reduces drying time to a mean error of just 10.9%. This number is not used, as it would be fitted to the droplets tested, rather than be its own, independently tested constant. On average, droplets dried 10.6% faster than predicted. This generally holds true for all conditions, save for those at the upper limit of the temperature range.</p>
+<h5>Tracer Delivery</h5>
+<p>The fraction of tracer delivery η was predicted with a 7.1% mean error, showing that the tested droplets were consistent with the expected particle activity within the droplet. The stopping time used of t*/t<sub>f</sub> = 0.92 was consistent with the implied t*/t<sub>f</sub> = 0.922 ± 0.025, found by back calculating from measured f<sub>ring</sub>s. The small spread of t*/t<sub>f</sub> across droplet sizes and conditions also shows why using the single constant works. F<sub>ring</sub> follows with ring width for a correlation of about r = 0.88, meaning droplets with wider rings also have a higher fraction delivered to the ring.  </p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig08-tracer-delivery.avif" alt="Measured ring fraction against the predicted η, and its link to ring width. Large points are condition means ± 1 SD; small points are individual droplets. Lines are fits with 95% confidence bands. Graph generated by  Claude based on recorded data and analysis." style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Measured ring fraction against the predicted η, and its link to ring width. Large points are condition means ± 1 SD; small points are individual droplets. Lines are fits with 95% confidence bands. Graph generated by  Claude based on recorded data and analysis.</p>
+<p>This is expected; when more tracer is delivered to a ring, the ring has to become wider. </p>
+<h5>Ring Width and CF<sub>dry</sub></h5>
+<p>On average, the predicted width of rings aligned with the measured ring width, with a ratio of 1.01, measured to predicted. However, this statistic does not show the true prediction performance of ring width predictions: the mean error was calculated at 35.5%, and only half of the 32 (16) droplets fell within ±25%. </p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig09-ring-width.avif" alt="Ring width matches on average, but measured rings widen with spot size while predicted rings narrow.  Graph generated by  Claude based on recorded data and analysis." style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Ring width matches on average, but measured rings widen with spot size while predicted rings narrow.  Graph generated by  Claude based on recorded data and analysis.</p>
+<p>Due to CF<sub>dry</sub> being related to ring width, it followed much of the same issues. The model predicted typical rings well, with a mean error of 22.4% and a predicted/measured ratio of 0.94, where 22 out of 32 (69%) of the droplets falling within ±25% . That said, predicted and measured CF were anti-correlated (r = -0.48). This indicates that droplets the model expected to concentrate more tended to concentrate less, and vice versa. Predicting for the average measurement of 1.49 gives a far smaller error of 10.9%, but isn’t a true representation of how droplets acted. The calculator determined a significant portion (27 of 31 classified) misses to be a result of ring width rather than delivery, which is consistent with the tight delivery error of 7.1%</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig10-concentration-factor.avif" alt="Predicted vs measured CF, and the opposite trends with spot size. Graph generated by  Claude based on recorded data and analysis." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Predicted vs measured CF, and the opposite trends with spot size. Graph generated by  Claude based on recorded data and analysis.</p>
+<h5>Baseline Droplet</h5>
+<p>Used throughout the Model Description, a baseline control droplet was dried and measured as a basis. This droplet was dried on an open bench (meaning no Sherwood number applied) in the following conditions: 23.5 °C, 55% RH, 5 µL, with a radius of R = 2.33mm. </p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Predicted</th>
+<th>Measured</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stopping time *</td>
+<td>32.6 min</td>
+<td>~31 min</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>Ring fraction (η vs f<sub>ring</sub>)</td>
+<td>0.722</td>
+<td>0.700 ± 0.019</td>
+<td>3%</td>
+</tr>
+<tr>
+<td>CF</td>
+<td>1.66</td>
+<td>1.745 ± 0.075</td>
+<td>5%</td>
+</tr>
+</tbody></table>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/modelingimgs/model-v2-fig11-baseline-droplet.avif" alt="Baseline droplet on an open bench. All three predictions are within 5% of the measurements. Error bars show measurement uncertainty, and stopping time has none reported. Graph generated by  Claude based on recorded data and analysis." style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Baseline droplet on an open bench. All three predictions are within 5% of the measurements. Error bars show measurement uncertainty, and stopping time has none reported. Graph generated by  Claude based on recorded data and analysis.</p>
+<p>All three predictions were within 5% of the measurement, and similar to chamber measurements, the drying was slightly faster than predicted. Because no airflow correction was applied, this agreement shows that the evaporation law holds on its own, regardless of the airflow applied within the chamber. The close CF match is also consistent with the model’s ability to predict the average CF well, as one baseline condition cannot show a trend across 11 different conditions. </p>
+<h5>Validity and Limitations</h5>
+<p>The underlying factor to some of the error within these two predictions lies within an assumption made, being δ<sub>ring</sub> (the thickness of annulus formed). By back calculation of the deposit thickness from each droplet’s measurements, the average δ<sub>ring</sub> comes out to 21.0 µm. While this may seem like a minor difference to the assumed 20µm, the issue with that number lies in the averaging, with a 33% spread across the log. As spots get larger, the rings formed by the deposit form thinner, wider rings, so the fixed-thickness assumption turns into a limitation. While fitting the δ<sub>ring</sub> separately for each droplet may solve this problem, it ultimately removes some of the predictive capabilities of the model. It would make the model circular, rather than an end-to-end predictive test. </p>
+<p>Additionally, in the model the following assumptions were made:<br>The model treats the tracer as evenly mixed through the droplet’s height, although our ε²Pe ranged from 4.6 to 62, well above the limit of 1, so the tracer likely concentrated near the surface.<br>Evaporation rate and properties are not constant, though they are treated as such in the model’s calculations; Many variables that determine it change as the droplet dries<br> The contact line is assumed to be fixed and circular at any time. While this held up for most droplets testing, including all droplets included in data calculations, it is not guaranteed.</p>
+<h5>Scope of Model</h5>
+<p>The model was using tested using a dilute BSA mixture with microsphere bead tracers. Undiluted blood has a solid content 15 times higher than the mixture used (45% of blood vs 3% in droplet).<br>Tested only warm and semi-arid conditions, due to limitations in hardware. Conditions under 23°C, and 35% RH while the model should predict them correctly, have not been tested.<br>This model only predicts how particles within a droplet concentrates to a coffee-ring. The capture of LOCKR, pfLDH and other diagnostic variables were not predicted or tested. </p>
+<h6>Measurement Limits</h6>
+<p>Spot radius and ring boundaries are taken from the brightness thresholds in ImageJ, so part of the spread in f<sub>ring</sub> and ring width may come from where those are taken by</p>
+
+</div><div class="section-block">
+<h4>Conclusion</h4>
+<h5>Drying Times</h5>
+<p>The prediction for drying times has been validated. The model tracks with the measured drying time across the tested conditions of 23-31°C and 36-87%, using only an independent-from-model airflow correction. If adjusted to the properties of the final diagnostic droplet, the model can be used to plan drying and imaging times in different field conditions within the tested ranges.  The evaporation modeling used was consistent outside of the chamber after removing the Sherwood number as well. </p>
+<h5>Delivery</h5>
+<p>The delivery predictions of the model are consistent; By using an estimated stopping time in advance, the fraction of particles that reach a concentrated ring can be predicted consistently, in agreement with our mean error of 7.1% in our testing.</p>
+<h5>Concentration</h5>
+<p>While the model predicts close to the measured on average, it is not clear how the model predicts which droplets conceav, due to our correlation of r = -0.48 between predicted and measured values. The cause can be traced back to the model’s assumption that deposit thickness is constant across all droplets. In reality, thickness falls as spots get larger. </p>
+<p>In application, the model can currently be used to accurately predict how long a droplet dries and roughly predict what concentration factor of particles to a dried ring a given recipe in a given environmental condition will produce. The model also provides insight into diagnostic design: a droplet of solely blood should not be used; rather, a dilute solution with a low solid content, due to how solid content can affect the formation of a clear ring as a whole. </p>
+<h5>Future Improvements &amp; Next Steps</h5>
+<p>Following the results given by this version of our model, we began to think about how it could further be investigated and/or improved. We devised the following: </p>
+<ul>
+<li>With the aforementioned issue with the thickness of the annulus of the ring δ<sub>ring</sub>, using profilometry or precise side-on imaging of dried rings would replace the estimated δ<sub>ring</sub> with measured values of each droplet, </li>
+<li>As a continuation of the previous issue, predicting thickness from droplet geometry and properties by linking δ<sub>ring</sub> to near-edge film height could let the model become even more predictive, while also becoming more accurate. </li>
+<li>Testing droplets of different complexes using the same fashion of varying environmental conditions could further validate whether the model generalizes beyond the recipes used in this project.</li>
+<li>Testing the droplet with pfLDH and the LOCKR complex in the droplet proved too expensive and was not possible within the project timeline. In future revisions and applications of this model, it would be beneficial to replace the bead tracer with these proteins, so that it can be a 1:1 test to the ideal droplet.</li>
+</ul>
+
+</div></section><section class="wiki-section toc-section" id="references">
+            <h3><span class="chapter-number" aria-hidden="true">04</span><span>References</span></h3>
+
+
+
+          <div class="section-block">
+  <h4 class="section-block-label">Binder Creation Pipeline</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">HybriDock-Pep</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">LOCKR Integration</h4>
+
+</div><div class="section-block">
+  <h4 class="section-block-label">Coffee-Ring Assay</h4>
+<p>Deegan, R. D. et al. (1997). Capillary flow as the cause of ring stains from dried liquid drops. <em>Nature</em> 389, 827–829.</p>
+
+<p>Deegan, R. D. et al. (2000). Contact line deposits in an evaporating drop. <em>Phys. Rev. E</em> 62, 756–765.</p>
+
+<p>Dixon, A. S. et al. (2016). NanoLuc complementation reporter optimized for accurate measurement of protein interactions in cells. <em>ACS Chem. Biol.</em> 11, 400–408.</p>
+
+<p>Einstein, A. (1905). Über die von der molekularkinetischen Theorie der Wärme geforderte Bewegung von in ruhenden Flüssigkeiten suspendierten Teilchen. <em>Ann. Phys.</em> 17, 549–560.</p>
+
+<p>Hall, M. P. et al. (2012). Engineered luciferase reporter from a deep sea shrimp utilizing a novel imidazopyrazinone substrate. <em>ACS Chem. Biol.</em> 7, 1848–1857.</p>
+
+<p>Hu, H. &amp; Larson, R. G. (2002). Evaporation of a sessile droplet on a substrate. <em>J. Phys. Chem. B</em> 106, 1334–1344.</p>
+
+<p>Hu, H. &amp; Larson, R. G. (2005a). Analysis of the microfluid flow in an evaporating sessile droplet. <em>Langmuir</em> 21, 3963–3971.</p>
+
+<p>Hu, H. &amp; Larson, R. G. (2005b). Analysis of the effects of Marangoni stresses on the microflow in an evaporating sessile droplet. <em>Langmuir</em> 21, 3972–3980.</p>
+
+<p>Hu, H. &amp; Larson, R. G. (2006). Marangoni effect reverses coffee-ring depositions. <em>J. Phys. Chem. B</em> 110, 7090–7094.</p>
+
+<p>Larson, R. G. (2014). Transport and deposition patterns in drying sessile droplets. <em>AIChE J.</em> 60, 1538–1571.</p>
+
+<p>Marín, Á. G., Gelderblom, H., Lohse, D. &amp; Snoeijer, J. H. (2011). Order-to-disorder transition in ring-shaped colloidal stains. <em>Phys. Rev. Lett.</em> 107, 085502.</p>
+
+<p>Martínez-Puig, J., D'Agostino, G., Oña, A. &amp; Rodríguez-Rodríguez, J. (2025). On the role of water activity on the formation of a protein-rich coffee ring in an evaporating multicomponent drop. arXiv:2509.09315.</p>
+
+<p>Moore, M. R., Vella, D. &amp; Oliver, J. M. (2021). The nascent coffee ring: how solute diffusion counters advection. <em>J. Fluid Mech.</em> 920, A54.</p>
+
+<p>Oron, A., Davis, S. H. &amp; Bankoff, S. G. (1997). Long-scale evolution of thin liquid films. <em>Rev. Mod. Phys.</em> 69, 931–980.</p>
+
+<p>Picknett, R. G. &amp; Bexon, R. (1977). The evaporation of sessile or pendant drops in still air. <em>J. Colloid Interface Sci.</em> 61, 336–350.</p>
+
+<p>Popov, Y. O. (2005). Evaporative deposition patterns: spatial dimensions of the deposit. <em>Phys. Rev. E</em> 71, 036313.</p>
+
+<p>Routh, A. F. &amp; Zimmerman, W. B. (2004). Distribution of particles during solvent evaporation from films. <em>Chem. Eng. Sci.</em> 59, 2961–2968.</p>
+
+<p>Schneider, C. A., Rasband, W. S. &amp; Eliceiri, K. W. (2012). NIH Image to ImageJ: 25 years of image analysis. <em>Nat. Methods</em> 9, 671–675.</p>
+
+<p>Scott, G. D. &amp; Kilgour, D. M. (1969). The density of random close packing of spheres. <em>J. Phys. D: Appl. Phys.</em> 2, 863–866.</p>
+
+<p>Sempels, W., De Dier, R., Mizuno, H., Hofkens, J. &amp; Vermant, J. (2013). Auto-production of biosurfactants reverses the coffee ring effect. <em>Nat. Commun.</em> 4, 1757.</p>
+
+<p>Still, T., Yunker, P. J. &amp; Yodh, A. G. (2012). Surfactant-induced Marangoni eddies alter the coffee-ring effect. <em>Langmuir</em> 28, 4984–4988.</p>
+
+<p>Wilson, S. K. &amp; D'Ambrosio, H.-M. (2023). Evaporation of sessile droplets. <em>Annu. Rev. Fluaid Mech.</em> 55, 481–509.</p>
+
+</div></section></div>
+      </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">⇧</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    <script src="static/wiki-toc.js?v=refs4"></script>
+      <script src="static/carousel.js"></script>
+  
+
+</body></html>

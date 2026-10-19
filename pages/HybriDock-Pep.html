@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HybriDock-Pep — Denmark-GA iGEM 2026</title>
+    <base href="../">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/denmark.css">
+    <link rel="stylesheet" href="static/section-blocks.css">
+    <link rel="stylesheet" href="static/wiki-pages.css?v=d1ad75dc95bf">
+  </head>
+  <body class="wiki-interior" data-page-family="research">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+
+    <main>
+      <div class="page-hero">
+        <div class="container"><div class="chapter-intro">
+          <h1>HybriDock-Pep</h1>
+          <p class="summary">A diffusion sampler and a learned scorer for protein-peptide docking, in kcal/mol</p>
+        </div></div>
+      </div>
+
+      <div class="wiki-reading-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-handle" aria-hidden="true">Table of Contents</div>
+      <nav class="toc-nav" id="toc-links" aria-label="Page sections">
+        <p class="toc-nav-heading">On this page</p>
+      <a href="pages/HybriDock-Pep.html#overview" data-toc="overview">Overview</a><a href="pages/HybriDock-Pep.html#workflow" data-toc="workflow">One Program Workflow</a><a href="pages/HybriDock-Pep.html#ai-model" data-toc="ai-model">AI Model Integration</a><a href="pages/HybriDock-Pep.html#implementation" data-toc="implementation">Implementation Details</a><a href="pages/HybriDock-Pep.html#results" data-toc="results">Results &amp; Validation</a><a href="pages/HybriDock-Pep.html#references" data-toc="references">References</a></nav>
+    </aside>
+
+      <div class="page-content">
+        <div class="container">
+
+
+
+
+
+
+<section class="wiki-section toc-section" id="overview"><h3><span class="chapter-number" aria-hidden="true">01</span><span>Overview</span></h3><div class="section-block">
+<h4>Background Information</h4><p>Nearly all binder-based diagnostic tests rely on small molecules, binders that are designed to fit in grooves and pockets across proteins and create strong bonds between them. However, the small molecule-based binder tests can only detect a minority of all proteins, with the human body’s proteome only having 15% of its proteins be able to bind with small molecules. This percentage of proteins with plausible small molecules only grows smaller, as many diseases have begun to evolve out of them, an example being malaria’s HRP-II protein, already not found in more than 45 million infected people.</p>
+<p>However, there does seem to be a solution: computationally designed de novo peptides–short chains of amino acids, generally under 25 amino acids long that are generated through computational methods and cannot be found in nature. These peptides are highly coveted as binders due to their variety coming from their enormous amount of possible combinations and their ability to bind to virtually any protein. Furthermore, with the vast amount of configurations, variable geometry and flexibility and sheer amount of peptide combinations, they are the perfect choice to create protein-specific, high-affinity binders, unique to each protein.</p>
+
+</div><div class="section-block">
+<h4>Personal Experience &amp; Academic Feedback</h4><p>The development, optimization, and computational modelling of peptide binders have always been gated by large corporations and prestigious universities due to their requirement of large computing clusters, along with slow, iterative computing algorithms, and an accuracy &lt;10% for developed peptides. Furthermore, old Monte Carlo algorithms iterate through billions of different possible peptide poses, still unable to cover all poses.</p>
+<p>During our work on peptides during the start, we relied on softwares like AlphaFold, ESMFold, Boltz-2, and we identified a key issue: the current software was incredibly unoptimized for peptides. Once we had our own doubts, we referred to academia to identify more problems regarding the computational development of peptides and it gave us shocking revelations:</p>
+<p>“We had a team of like 12 people working on exactly the project (peptide development) you’re working on... after getting 12 people on it, our conclusion is it’s really hard to find data and most of it’s mislabeled” - Dr.Coventry</p>
+<p>“...most of the softwares … aren't really super accurate to protein and peptide interactions. …under 30 amino acids, the accuracy of alpha fold dropped significantly ... ” - Dr.Hosseinzadeh</p>
+<p>Through academic feedback and our own experience, we found the primary issue: there doesn’t exist a platform to effectively and accurately design peptide binders that include specialized docking and scoring.</p>
+
+</div><div class="section-block">
+<h4>Solution</h4><p>In order to combat these issues, we made HybriDock-Pep over the course of 6 months. HybriDock-Pep is a novel ML-based docking and affinity scoring tool. We used a modified and improved upon version of RAPiDock as our base, using its features: bi-conformational graph encoding and SE(3)-equivariant denoising, along with our own custom GPU kernels and support for speed on x86 and ARM-based machines. Then, we paired it with our physics-based ML model to score protein-peptide interactions in kcal/mol with accuracy comparable to FEP, at a fraction of compute cost and an even smaller amount of time needed.</p>
+
+</div></section><section class="wiki-section toc-section" id="workflow"><h3><span class="chapter-number" aria-hidden="true">02</span><span>One Program Workflow</span></h3><div class="section-block">
+<h4>Stage 1: diffusion sampling</h4>
+</div><div class="section-block">
+<h4>Stages 1.5 to 3: relief, ranking and clustering</h4>
+</div><div class="section-block">
+<h4>Stage 3.6: the binding energy</h4>
+</div><div class="section-block">
+<h4>Blind docking</h4>
+</div><div class="section-block">
+<h4>Selectivity</h4>
+</div><div class="section-block">
+<h4>Outputs</h4>
+</div></section><section class="wiki-section toc-section" id="ai-model"><h3><span class="chapter-number" aria-hidden="true">03</span><span>AI Model Integration</span></h3><div class="section-block">
+<h4>The sampler</h4>
+</div><div class="section-block">
+<h4>The scorer</h4>
+</div><div class="section-block">
+<h4>Why train on AI poses</h4>
+</div><div class="section-block">
+<h4>Short peptides and uncertainty</h4>
+</div></section><section class="wiki-section toc-section" id="implementation"><h3><span class="chapter-number" aria-hidden="true">04</span><span>Implementation Details</span></h3><div class="section-block">
+<h4>Install</h4>
+</div><div class="section-block">
+<h4>A first run</h4>
+</div><div class="section-block">
+<h4>Website and terminal UI</h4>
+</div><div class="section-block">
+<h4>Testing and reproducibility</h4>
+</div></section><section class="wiki-section toc-section" id="results"><h3><span class="chapter-number" aria-hidden="true">05</span><span>Results &amp; Validation</span></h3><div class="section-block">
+<h4>How we benchmark</h4>
+</div><div class="section-block">
+<h4>Headline numbers</h4>
+</div><div class="section-block">
+<h4>Where it loses</h4>
+</div><div class="section-block">
+<h4>What the error means</h4>
+</div><div class="section-block">
+<h4>MDM2 and p53, as a worked example</h4>
+</div><div class="section-block">
+<h4>The Coventry grid</h4>
+</div><div class="section-block">
+<h4>Limits</h4>
+</div></section><section class="wiki-section toc-section" id="references"><h3><span class="chapter-number" aria-hidden="true">06</span><span>References</span></h3><ol class="references-list"><li class="section-block"><p>Choppa, P. R. HybriDock-Pep (2026). <a href="https://github.com/Tasty-Ramen2010/hybridock-pep">https://github.com/Tasty-Ramen2010/hybridock-pep</a>. Archived at Zenodo: <a href="https://doi.org/10.5281/zenodo.21764713">https://doi.org/10.5281/zenodo.21764713</a> (source snapshot and research ledger) and <a href="https://doi.org/10.5281/zenodo.21680573">https://doi.org/10.5281/zenodo.21680573</a> (data).</p>
+<p>Zhao et al. (2025). RAPiDock. Nature Machine Intelligence, 7, 1308.</p>
+<p>Eberhardt et al. (2021). AutoDock Vina 1.2.0. Journal of Chemical Information and Modeling, 61, 3891.</p>
+<p>Eastman et al. (2017). OpenMM 7. PLOS Computational Biology, 13, e1005659.</p>
+<p>Romero-Molina et al. (2022). PPI-Affinity. Journal of Proteome Research, 21, 1829.</p>
+<p>Agrawal, P., et al. (2019). Benchmarking of different molecular docking methods for protein-peptide docking. BMC Bioinformatics, 19. <a href="https://doi.org/10.1186/s12859-018-2449-y">https://doi.org/10.1186/s12859-018-2449-y</a></p>
+<p>Wang et al. (2024). Current Medicinal Chemistry, 31(31), 4127. <a href="https://doi.org/10.2174/0929867331666230908102925">https://doi.org/10.2174/0929867331666230908102925</a></p>
+<p>Wu et al. (2025). Science, 389, eadr8063 (the 18 by 18 specificity grid, Fig. 2B).</p>
+</li></ol></section></div>
+      </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">⇧</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    <script src="static/wiki-toc.js?v=022a3252fdb1"></script>
+      <script src="static/carousel.js"></script>
+  
+
+
+</body></html>

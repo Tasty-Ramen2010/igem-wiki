@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Software 2 — Denmark-GA iGEM 2025</title>
+    <base href="../">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/denmark.css">
+    <link rel="stylesheet" href="static/section-blocks.css">
+    <link rel="stylesheet" href="static/wiki-pages.css?v=d1ad75dc95bf">
+  </head>
+  <body class="wiki-interior" data-page-family="research">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+
+    <main>
+      <div class="page-hero">
+        <div class="container"><div class="chapter-intro">
+          <h1>LATTE</h1>
+          <p class="summary">LOCKR Affinity and Thermodynamics Tuning Engine</p>
+        </div></div>
+      </div>
+
+      <div class="wiki-reading-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-handle" aria-hidden="true">Table of Contents</div>
+      <nav class="toc-nav" id="toc-links" aria-label="Page sections">
+        <p class="toc-nav-heading">On this page</p>
+        
+        
+        
+        
+        
+      <a href="pages/LATTE.html#overview" data-toc="overview">Overview</a><a href="pages/LATTE.html#implementation" data-toc="implementation">Scanner</a><a href="pages/LATTE.html#results" data-toc="results">Calculator</a><a href="#temeprature-window" data-toc="temeprature-window">Temeprature Window</a><a href="#implementation-2" data-toc="implementation-2">Implementation</a><a href="pages/LATTE.html#references" data-toc="references">References</a></nav>
+    </aside>
+
+      <div class="page-content">
+        <div class="container">
+
+          
+
+          
+
+          
+
+          
+
+                    
+
+          
+
+        <section class="wiki-section toc-section" id="overview"><h3><span class="chapter-number" aria-hidden="true">01</span><span>Overview</span></h3><div class="section-block">
+<h4>Problem</h4><p>&nbsp;&nbsp;&nbsp;&nbsp;Designing a LOCKR system [1] is often time-intensive, and grafting a binder into perfect location of the protein's latch is difficult. Binders for LOCKR systems must be optimized to have minimal acidic amino acids as they will interfere with cage-key interaction, and to make things harder, detecting the efficiency of the LOCKR system(its fold-change) simmers down to a ton of thermodynamics equations. LATTE solves these problems in a singular tool with 3 modules. It leverages a CPU-only framework that works at high speeds and efficiency and can run on virtually any machine.</p>
+
+</div><div class="section-block">
+<h4>Solution</h4><p>&nbsp;&nbsp;&nbsp;&nbsp; The first module is a binder scanner that finds acidic residues in the peptide, and replaces them with more neutral and favorable amino acids. This lowers cage-key interferences to improve LOCKR efficiency. Acidic residues matter because their negative charge actually pulls on the cage and key in ways that they are not designed to. The <strong>Scanner</strong> module will scan the designed peptide for these negatively charge amino acids and will replace them with safer variants that improve cage-key interaction helical confidence. </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; The second module then incorporates user-focused variables and LOCKR-centered variables like cage-key affinity and lucKey concentrations to calculate fold-change, or the LOCKR system's ability to emit luminescence. This also works in an inverted topology, telling you how much lucKey is needed to reach a desired fold change.  LATTE can also warn you when your targeted fold-change is physically unreachable.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; The third and final module is called the </p>
+
+</div><div class="section-block">
+<h4>Interface</h4><p>Because LATTE is focused on making the mathematical aspect of LOCKR creation easy, we've decided to introduce a user-friendly interface too. LATTE has a CLI interface and a web-app interface served locally.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-flowchart.avif" alt="LATTE Software Workflow" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">LATTE Software Workflow</p>
+</div></section><section class="wiki-section toc-section" id="implementation">
+            <h3><span class="chapter-number" aria-hidden="true">03</span><span>Scanner</span></h3>
+            
+          <div class="section-block">
+<h4>Single-Sequence Scanning &amp; Grafting Workflow</h4><p>Use this mode when you want to fully diagnose and graft a single candidate binder. The process starts with asting the binder's amino acid sequence into the Scanner module, and LATTE will strip all whitespace while also rejecting unknown letters. You can also look into advvanced settings like certain postition preservations and different approches for substitution. Then you can hit <em><strong>Scan</strong></em> and the system will scan the binder for acidic residues and will provide a charge-optimized variant. This variant can be sent directly to the <strong>Calculator</strong> module. The user can then choose to graft their original binder or the charge-optimized variant into LOCKR's LucCage. The system will graft the binder into multiple positions and will tell you the best position to graft into. It will also provide a PDB file for export as well as an amino acid sequence. An example can be seen with ECLIPSE's PfLB-1 binder sequence shown below.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-single.avif" alt="Single-Scanning on LATTE" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Single-Scanning on LATTE</p>
+</div><div class="section-block">
+<h4>Batch-Sequence Scanning &amp; Grafting Workflow</h4><p>Batch Mode can be used when you have many binder candidates that you want to run at once, and this can be seen as the output of a ProteinMPNN run. The user can upload a FASTA or just inut multiple sequences, and LATTE will scan each binder with the same settings while returning a ranked table with net charge, liability, and the charged-optimized variant per binder.</p>
+<p>If one of the sequences in the list is invalid, it gets flagged in the table while the rest of the batch gets scanned, optimzied, and grafted. The output table can be exported as a CSV file.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-batch.avif" alt="Batch-Scanning on LATTE" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Batch-Scanning on LATTE</p>
+</div><div class="section-block">
+<h4>Reading a Scan</h4> <p>Reading the scan involves analyzing 3 major portions of the module: net charge, helix propensity, and liability. The net charge is the sum of charged residues at a neutral pH level (7.4). Highly negative and positive values suggest that the binder will severely interfere with the electrostatic interactions between LucCage's latch and key [2]. Liability marks the specific residues that cause problems to interferences in the context of the binder   with problematic residues primarily being D and E amino acids. Helix propensity is also shown in the context of percentage confidence and it uses Chou-Fasman helix propensities [3] to calculate for confidence. With the creation of the variant binder, this helical confidence is subject to change. Reading the scan is crucial to determining whether a variant binder is needed and for creating a LOCKR system that is functional and efficient.</p>
+
+</div><div class="section-block">
+<h4>Choosing a Substitution Strategy</h4><p>Regarding amino acid substitutions, the user has 2 choices: a conservative or neutralizing approach. A conservative approach involves substituting aspartic acids for glutamines, and glutamic acids for asparagines. This approach is often used to maintain the structure of the amino acid, by preserving hydrogen bonding. On the other hand, the neutralizing approach sterilizes the charge of the amino acid with small risks of changes in shape, as well as decreases in binding affinity. This approach substitutes aspartic and glutamic acids for alanine. By including this crucial step in LATTE, our software guarantees that the binder doesn't interact with K_CK interfaces.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Strategy</th>
+<th>Substitution</th>
+<th>Charge</th>
+<th>Hydrogen bonding</th>
+<th>Main risk</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Conservative</td>
+<td>D → N, E → Q</td>
+<td>Removes negative charge</td>
+<td>Preserved amide side chains</td>
+<td>Lower risk of structural change; charge is still removed</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Neutralizing</td>
+<td>D → A, E → A</td>
+<td>Removes negative charge</td>
+<td>Not preserved (alanine has no polar side chain)</td>
+<td>Small risk of shape change and reduced binding affinity</td>
+</tr>
+</tbody></table>
+
+</div><div class="section-block">
+<h4>Grafting into LucCage</h4><p>After reading the binder scan, and analyzing the variant binder, the user can then visualize how the peptide would sit in the latch. They can do this by utilizing the in-house grafting feature that utilizes a PyRosetta dependency of RosettaGraftSwitchMover. LATTE will graft the binder into every possible residue on the latch and will calculate for REU to determine the best location to start the latch. The lowest REU score is the best for LOCKR and when this is found, the user can download the modified LucCage [2] in the form of a PDB file. They can also copy the amino acid sequence for other use.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-grafting.avif" alt="Grafting Sequences onto LucCage with LATTE" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Grafting Sequences onto LucCage with LATTE</p>
+</div></section><section class="wiki-section toc-section" id="results">
+            <h3><span class="chapter-number" aria-hidden="true">04</span><span>Calculator</span></h3>
+            
+          <div class="section-block">
+<h4>Inputs and Units</h4> <p>All concentrations used in the calculator module utilize molar units while micromolar and nanomolar units are accepted, and affinities can be inputted as dissociation constants. In addition, the primary inputs are K_open, the equillibrium constant for latch leakiness; pull strength, how strongly target binding pulls the switch towards an open state; K_CK, the dissociation constant for lucKey binding to lucCage; and the total concentrations of LucKey and target protein. The advanced tab within the calculator module includes information like the binder-target binding affinities (measurable in dG or kcal/mol), but in some scenarios, it requires an anchor dG for references.</p>
+
+</div><div class="section-block">
+<h4>Fold-Change Results</h4><p>Fold-change is measured as the ratio of signal with target to signal without target. High fold-chnage constitutes a clear distinction between on and off responses. A low fold-change mean that the target barely opens the switch and if it does, then the signal is very weak. Low fold change with a low off signal means the binder is weak while a low fold chnage with a high off signal means the switch leaks signal. The calculator also suggests regimes to increase the fold-change in a scenario: increasing pull-strength, improving the binder, or improving K_open [2]. LATTE also reports the dominance ratio(DR), the ratio of LucKey to K_CK. When DR is large, Key-Cage interactions dominate LOCKR equillibrium and K_open tuning barely changes the result; DR is not a strict limit/ceiling to fold-change, and it is just a diagnostic for reference [2].</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-foldchange.avif" alt="Fold-Change Section and Suggestions" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fold-Change Section and Suggestions</p>
+</div><div class="section-block">
+<h4>K_open Estimates and Tuning</h4> <p>K_open is difficult to find on its own, but LATTE allows you to explore it. LATTE give the user a reasonable starting point with measurements from literature. K_open can even be estinated from latch-cage binding energies, which are calculated in REU. It is important to note that REU is not a free energy score, so they should be treated as a guide, not a direct input.</p>
+<p>IN order to see how the unpredictability of your K_open matters, you can sweep through different values to see how fold-change changes. Introducing latch mutations is also a good method for imcreasing the K_open of the LOCKR system. LATTE finds the best mutations for any LOCKR system and calculates for a new REU.</p>
+
+</div><div class="section-block">
+<h4>Key-Dosing Back-Calculator</h4> <p>The original calculator module includes a <strong>forward</strong> calculator to determine fold chnage based on a given amoount of lucKey and other variables. We introduced a new <strong>backward</strong> calculating section to calculate for a lucKey cocnentrations based on a targeted fold-change and other constants like K_open, pull, and K_CK. In a scenario where a target fold-change is not reachable, LATTE will tell the user that and explains why it is unattainable.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-forward-backward-calculator-blue.avif" alt="Diagram of Calculator Topology" style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Diagram of Calculator Topology</p>
+</div></section><section class="wiki-section toc-section" id="temeprature-window"><h3>Temeprature Window</h3><div class="section-block">
+<h4>Inputs and Outputs</h4> <p>This module was created to sweep accross a multitude of temperatures to measure where your proposed LOCKR design works. It takes in 3 basic variables that are measured in free energy (ΔG): cage-key ΔG, cage-latch ΔG, and overall binder affinity. Additionally, the binding affinity can be given in ΔG (kcal/mol) or in Kd (nM). The Kd will be converted into the ΔG value in the engine when the module is ran. Concentrations in nM will be converted to molar too.</p>
+<p>The module also contains an advanced section for more options and constraints. The sweep range variable sets a range for temperatures to test in celcius. In addition, there is a fold-change bar variable that can be modified. Because each LOCKR design will have a different targeted fold-change, this variable will enable the user to test how different operating temperatures allow the LOCKR system to reach its designed purpose. There is also a sampling count variable that allows the user to modify how many Monte Carlo samples are used; this number can range from 200 to 20,000. The temperature window also accounts for ΔH, but the placeholder values given are rough estimates from literature and should be taken lightly.</p>
+
+</div><div class="section-block">
+<h4>Reading a Window</h4>
+<p>The plot within the module displays 3 features at every temperatures within the sweep. The first item is the median curve of the typical fold-chnage across all samples. From p10 to p90, there's a band that displays the middle 80% of samples. A wide band here would show uncertainty in predictions. Additionaly, there is a item called P(works) and it displays the fraction of samples whose fold-change passes the predetermined bar.. Essentially, it is the number that drives the whole window.</p>
+<p>The module also reports 2 answers: the best temperature and the operating window. The best temperature is the temperature at which the design has the highest median fold-change. The operating window displays the longest band of temperatures at which the P(works) is at or higher than the confidence setting.</p>
+<p>In the case that no design passes the confidence or fold-change bar, LATTE will tell you that and it will report the highest P(works)  value and temperature. It also suggests lowering the fold-chnage bar to increase confidence while also suggesting to widen the sweep and improve the design. </p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/latteimg/latte-tw.avif" alt="Temperature Window Section on LATTE" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Temperature Window Section on LATTE</p>
+</div><div class="section-block">
+<h4>Monte Carlo and dH Priors</h4> <p>Knowing the ΔG at a single temperature is not enough to know how it will work at another. Enthalpy (ΔH) is needed for this and LATTE uses the van’t Hoff relationship to pin the entropy with ΔS = (ΔH - ΔG) / T, compute ΔG(T) = ΔH - TΔS across the full range, and then converts to constants with K = exp(ΔG(T) / RT). The fold-change utilizes the same calculations and functions from the calculator module and pull is fixed at 10.</p>
+<p>In literature, ΔH is barely measured for these kinds of interactions, so our module draws on multiple in the form of a range rather than guessing. Each Monte Carlo samples utilizes a ΔH for the latch-cage, key-cage, and binder-target interactions, while also drawing on the binder's ΔG around a deafult standard deviation of 1.5 kcal/mol. If the user inputs a ΔH, it is held fixed. If a binder is inputed, it only matters if a target concentration is given. Otherwise, it is considered as a saturating and the binder's ΔG, uncertainity, and ΔH cancel out.</p>
+<p>Results from this module should be read as a sread, and not a prediction because no ΔH has been published for the lucCage LOCKR systems. Priors for these ΔH values are mere assumptions based on a vast range of literature; however, these values are negative and they will sit inside a range of -66.7 to +19.9 kcal/mol as seen accross 196 protein-protein compelxes beasured by ITC [#4]. LATTE also ignores dCp (heat capacity), so valuea are only trustworthy within 15K of 25°C.</p>
+<p>The Calculator module features a "Send to Temperature Window" button that converts K_CK, K_open, and K_target into a ΔG value at 25°C and fills the form; it won't be able to provide a ΔH value because ΔH can't be derived from a single temperature.</p>
+
+</div></section><section class="wiki-section toc-section" id="implementation-2"><h3>Implementation</h3><div class="section-block">
+<h4>Web App, CLI, and API</h4><p>LATTE utilizes a FastAPI backend that wraps the thermodynamics equations and engine into a front end that is built on HTML, CSS, and Javascript. Our team built it in phases starting with the engine, then the backend and front end, and finally the command line interface(CLI) and any extra features. By keeping the enigne seperate from the backend, LATTE ensures that the CLI, the wep-app, and the API all receive the same answers. </p>
+<p>Starting the web-app is simple and acts as a server that runs locally. Every module in the web-app is available as a tab at the top of the interface. The CLI allows the user to run batch jobs, scans, and calculations straight from the terminal using commands like <code>lockr scan SEQUENCE</code>, <code>lockr graft SEQUENCE --position 327</code>, and <code>lockr fc --k-ck 10 --k-open 0.001 --pull 10 --luckey 500</code>. </p>
+<p>Each module also uses a REST endpoint with JSON inputs and outputs. There is also a suite that contains 100+ tests covering the engine, backend, and frontend.</p>
+
+</div><div class="section-block">
+<h4>Installation and PyRosetta</h4> <p>The installation of LATTE really only requires Python as the software is CPU-only. All modules function regularly without a GPU needed. Use these commands to install LATTE:<br><br></p>
+<pre><code>git clone https://github.com/VishnuTejasT/LOCKR.git
+cd LOCKR
+conda create -n lockr python=3.10
+conda activate lockr
+pip install -e .
+pip install -e ".[test]"
+</code></pre>
+<br>
+However, for grafting the binder into LucCage, Rosetta GraftSwitchMover is needed, and it requires the PyRosetta dependancy. This step is completely optional and is only required for one step in the workflow. PyRosetta requires a license for non-commercial use but it is very easy to install in a dedicated conda environment like ours. To install the PyRosetta dependency, use this:<br>
+<br><pre><code>conda activate igem
+pip install pyrosetta \
+  --find-links https://west.rosettacommons.org/pyrosetta/quarterly/release
+# East coast mirror if West is slow:
+# pip install pyrosetta \
+#   --find-links https://graylab.jhu.edu/download/PyRosetta4/archive/release-quarterly/release
+
+# Python 3.10 is required (already used by the igem conda env)
+# Verify:
+python3 -c "from pyrosetta import init; init(); print('OK')"
+</code></pre>
+
+</div></section><section class="wiki-section toc-section" id="references">
+            <h3><span class="chapter-number" aria-hidden="true">05</span><span>References</span></h3>
+            <ol class="references-list"><li class="section-block"><p>Langan, R. A., Boyken, S. E., Ng, A. H., Samson, J. A., Dods, G., Westbrook, A. M., Nguyen, T. H., Lajoie, M. J., Chen, Z., Berger, S., Mulligan, V. K., Dueber, J. E., Novak, W. R. P., El-Samad, H., &amp; Baker, D. (2019). De novo design of bioactive protein switches. Nature, 572(7768), 205–210. <a href="https://doi.org/10.1038/s41586-019-1432-8">https://doi.org/10.1038/s41586-019-1432-8</a></p>
+</li>
+<li class="section-block"><p>Quijano-Rubio, A., Yeh, H.-W., Park, J., Lee, H., Langan, R. A., Boyken, S. E., Lajoie, M. J., Cao, L., Chow, C. M., Miranda, M. C., Wi, J., Hong, H. J., Stewart, L., Oh, B.-H., &amp; Baker, D. (2021). De novo design of modular and tunable protein biosensors. Nature, 591(7850), 482–487. <a href="https://doi.org/10.1038/s41586-021-03258-z">https://doi.org/10.1038/s41586-021-03258-z</a></p>
+</li>
+<li class="section-block"><p>Chou, P. Y., &amp; Fasman, G. D. (1978). Prediction of the secondary structure of proteins from their amino acid sequence. Advances in enzymology and related areas of molecular biology, 47, 45–148. <a href="https://doi.org/10.1002/9780470122921.ch2">https://doi.org/10.1002/9780470122921.ch2</a></p>
+</li>
+<li class="section-block"><p>Teilum, K., Olsen, J. G., &amp; Kragelund, B. B. (2015). Globular and disordered-the non-identical twins in protein-protein interactions. Frontiers in Molecular Biosciences, 2, 40. PubMed Central. <a href="https://doi.org/10.3389/fmolb.2015.00040">https://doi.org/10.3389/fmolb.2015.00040</a></p>
+</li></ol>
+          </section></div>
+      </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">⇧</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    <script src="static/wiki-toc.js?v=022a3252fdb1"></script>
+      <script src="static/carousel.js"></script>
+  
+
+
+</body></html>

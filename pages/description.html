@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Description — Denmark-GA iGEM 2026</title>
+    <base href="../">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/denmark.css">
+    <link rel="stylesheet" href="static/section-blocks.css">
+    <link rel="stylesheet" href="static/wiki-pages.css?v=d1ad75dc95bf">
+  </head>
+  <body class="wiki-interior" data-page-family="research">
+    <div id="scroll-progress"></div>
+    <div id="nav"></div>
+
+<main>
+      <div class="page-hero">
+        <div class="container">
+          <div class="chapter-intro"><h1>Project Description</h1>
+          <p class="summary draft-summary">--</p></div>
+        </div>
+      </div>
+
+      <div class="wiki-reading-layout">
+        <aside class="toc-sidebar" aria-label="Table of contents">
+          <div class="toc-handle" aria-hidden="true">Table of Contents</div>
+          <nav class="toc-nav" id="toc-links" aria-label="Page sections">
+            <p class="toc-nav-heading">On this page</p>
+            
+            
+            
+            
+            
+            
+          <a href="pages/description.html#abstract" data-toc="abstract">Abstract</a><a href="pages/description.html#inspiration" data-toc="inspiration">Inspiration</a><a href="pages/description.html#background-info" data-toc="background-info">Background Info</a><a href="pages/description.html#current-diagnostics" data-toc="current-diagnostics">Current Diagnostics</a><a href="pages/description.html#our-solution" data-toc="our-solution">Our Solution</a><a href="pages/description.html#references" data-toc="references">References</a></nav>
+        </aside>
+      <div class="page-content">
+        <div class="container">
+
+          
+
+          
+
+          
+
+          
+
+          
+
+        
+
+
+
+
+
+
+
+
+
+<section class="wiki-section toc-section" id="abstract"><h3><span class="chapter-number" aria-hidden="true">01</span><span>Abstract</span></h3><div class="section-block">
+<p>LOCKR (Latching Orthogonal Cage/Key pRotein) is a de novo protein system that acts as a modular bioactive protein switch[#1], that when activated, produces a measurable luminescent signal. The mechanism involves a Cage that holds a sequestered peptide that is exposed when the Latch, a mobile helical part of the Cage, opens due to interaction with the target protein. The Key interacts with the opened Latch to produce luminescence. The LOCKR system can be modified to target specific proteins by altering the target motif located on the Latch. In order to create viable binders that can be grafted onto the Latch, we created two softwares: HybriDock-Pep and Latte. HybriDock-Pep is a peptide docking, scoring, and testing pipeline and Latte is a LOCKR specific software used to scan and optimize a chosen peptide sequence for LOCKR integration. It also calculates optimal concentrations of Key and target protein to create an effective switch. In order to test the viability of the two softwares, we decided to focus on an infectious disease, namely Malaria. </p>
+<p>Malaria is a life-threatening disease spread by mosquitoes containing parasites, found in tropical countries. Africa is the most impacted region, home to 95% of malaria cases and 95% of malaria deaths in 2024[#11]. A particularly dangerous strand, Plasmodium falciparum, can lead to severe illness or death within 24 hours. The most common diagnostic for Malaria is the rapid diagnostic test that targets HRP2[#10]. Although RDTs are known to yield false results, the WHO recommends switching to a non-HRP2 RDT when pfhrp2 gene deletions cause ≥5% of RDTs to result in false negatives. Although the prevalence of parasites with these mutations is low, it is rapidly increasing, with some African countries exceeding 15% in mutated parasites[#4]. We targeted pfLDH, an enzyme used in anaerobic glycolysis, since its necessity for survival makes it less likely to face deletions like pfhrp2.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/descriptionimgs/bindergen-backgroundinfo.avif" alt="De-Novo Protein Generation Workflow — Medium" style="max-width:90%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">De-Novo Protein Generation Workflow — Medium</p>
+</div></section><section class="wiki-section toc-section" id="inspiration">
+            <h3><span class="chapter-number" aria-hidden="true">02</span><span>Inspiration</span></h3>
+            <div class="section-block">
+              <span class="section-block-label">--</span>
+            </div>
+          </section><section class="wiki-section toc-section" id="background-info"><h3><span class="chapter-number" aria-hidden="true">03</span><span>Background Info</span></h3><div class="section-block">
+<p>De novo protein design has been on the rise in the past few years. It includes the creation of binders, ligands, and bioswitches, and with the oncoming of de-novo protein design, diagnostics like ELISAs and protein switches like LOCKR have grown to be extremely viable in a rapidly changing world. Tools like RFDiffusion, Protein/LigandMPNN and AlphaFold2 have accelerated protein development, but they come with a cost. RFDiffusion, for example, is highly GPU-intensive, and its only output is a peptide backbone sequence[#9]. Protein and Ligand MPNN counteract this problem with a fast, efficient protein optimization software that predicts amino acid sidechains that create a competent design[#8]. When running the pipeline as a whole, these designs take hours-days on end, with no guarantee that the constructs will work in vitro. However, there have been large accomplishments in this field, including LOCKR (Latching, Orthogonal Cage-Key pRotein).</p>
+
+</div><div class="section-block">
+<p>LOCKR is a framework designed by the University of Washington Baker Lab. At its core, LOCKR is a protein system with 3 components: the cage, the key, and the latch. The cage is a 5-helical bundle that serves as the foundation for the protein. The latch is also a helix, and it's attached to the cage of LOCKR. The latch is unique to every switch, and features a binding domain that acts as a trigger for the signal cascade. LOCKR switches maintain different functions, with a primary usage being for bioactive luminescence. These cages are popular under the name LucCage, with variants having different suffixes by target[#5]. In the LucCage/LucKey variants, the opening of the switch is coupled with luciferase reconstitution, which results in luminescent activity[#5]. The switch itself is designed with thermodynamics in mind. The whole system itself is governed by the relationship between the opening energy of the switch and the latch-target binding energy, with the key-cage binding energy holding the system in an active state. The thermodynamics of LOCKR will be emphasized in later sections of this wiki.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/descriptionimgs/lockr-backgroundinfo.avif" alt="LOCKR Visualization — Baker Lab" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">LOCKR Visualization — Baker Lab</p>
+</div><div class="section-block">
+<p>The tools that our team created were targeted against a real-world problem: Malaria. Current RDTs for Malaria detect a protein called HRP-2 (Histidine-Rich Protein), but the spread of parasites with this gene deletion has caused the HRP tests to be highly unreliable in many regions of the world [#7]. PfLDH, also known as Plasmodium falciparum lactate dehydrogenase, has been explored because of its necessity for parasitic function. In addition, other malarial strains like P. vivax and P.malariae present a ~90 % identity to PfLDH [#6].</p>
+
+<p>By designing a binder for PfLDH and grafting it into a LucCage LOCKR system, our team will be able to validate our softwares, LATTE and HybriDock, while also producing a functional diagnostic in the process.</p>
+
+</div></section><section class="wiki-section toc-section" id="current-diagnostics"><h3><span class="chapter-number" aria-hidden="true">04</span><span>Current Diagnostics</span></h3><div class="section-block">
+<p>As protein design is a relatively new branch of science, several issues were faced with testing our de novo binders in vitro. Some softwares that are commonly used are AlphaFold2-Multimer, HADDOCK 2.4, however, they do not provide an accurate binding affinity reading that will help influence wet-lab testing. AlphaFold2-Multimer or AF2-Multimer only filters peptides; it determines whether a peptide is a binder or a non-binder. It also only provides numerical data such as pLDDT, PAE, ipTM which requires structural modeling expertise to decipher. Although HADDOCK 2.4 results in an actual binding affinity score, it is much slower and is more computationally intensive compared to AF2-Multimer. Furthermore, in blind protein-peptide docking, it fails to give reliable success; success rate is ~45% in roughly known binding regions and lower in fully blind docking. We tried to use different softwares such as AutoDock Vina and AutoDock CrankPep but we were unable to gather a conclusion </p>
+
+</div><div class="section-block">
+<p>Malaria is a disease that is best detected via blood smear microscopy in a laboratory setting which allows for a clear visual of infected blood cells. However, this method requires individuals to be trained in microscopy and blood collection, as well as the facilities necessary to perform these procedures which may not be possible for remote areas with limited access to resources. Furthermore, since parasite density may be low during the initial appearance of symptoms, blood smears must be observed every 12 – 24 hours for a total of three sets before being diagnosed as negative for malaria [1]. The alternative for remote areas with reduced access to quality microscopic analysis of blood is Rapid Diagnostic Tests or RDTs that target the HRP2 protein using a sample of blood that is applied to the sample pad on the test card [11]. Results of the test are based on if a visible line appears where the test card shows a signal for certain malaria parasites. The drawback of this readily accessible test is that it may not be reliable in areas with pfhrp2 gene deletions that resulting in a lack of HRP2 protein expression[11].</p>
+
+</div></section><section class="wiki-section toc-section" id="our-solution"><h3><span class="chapter-number" aria-hidden="true">05</span><span>Our Solution</span></h3><div class="section-block">
+<p>HRP-2 acts as the current protein for detection, but since it is constantly deleted by the parasite, our team set out for a better protein to detect, and with that, we found PfLDH, a protein essential for parasitic function. Our diagnostic features a double-tech design that leverages bioactive switch usage and evaporation-leveraged concentration to create a viable signal in under an hour.</p>
+
+</div><div class="section-block">
+<h4>LOCKR</h4>
+<p>The first step of the diagnostic is the LOCKR integration. Our LOCKR system utilizes a LucCage framework that emits luminescence in the presence of PfLDH. The LucCage scaffold was developed by the UW Baker Lab and uses an inverted cascade topology: rather than the key opening the latch, a target protein drives latch opening, and the key acts as a luminescence starter. This is contradictory to what other LOCKR systems do, as these switches usually have a key protein that drives latch opening. The latch itself contains a charge-optimized binder that binds directly to PfLDH’s NADH active site. Upon binding, the latch will be forced open, and this  gives space for LucKey to bind to LOCKR. When this happens, a small bit of luciferase on the LOCKR system will reconstitute with a large bit of luciferase on LucKey, producing luminescence in the presence of its substrate furimazine. However, the luminescence from LOCKR alone will not be viable, as it can’t be viewed by the human eye. This brings us to the second part of the diagnostic, the coffee ring assay.</p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/animations/lockranim.webp" alt="LOCKR Animation" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">LOCKR Animation</p>
+</div><div class="section-block">
+<h4>The Coffee Ring Effect</h4>
+<p>The second phase of the diagnostic leverages evaporative cooling of a droplet, a phenomenon known as the coffee ring effect. A droplet is placed on a prefunctionalized glass slide, and as the droplet evaporates, capillary flow pushes the LOCKR proteins downwards and outwards, while concentrating the luminescence in a ring of light visible to the human eye [3]. </p>
+
+<img src="https://static.igem.wiki/teams/6112/wiki/animations/coffeering.webp" alt="Coffee Ring Animation" style="max-width:75%;display:block;margin:1.5em auto">
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Coffee Ring Animation</p>
+</div></section><section class="wiki-section toc-section" id="references">
+            <h3><span class="chapter-number" aria-hidden="true">06</span><span>References</span></h3>
+            <ol class="references-list"><li class="section-block"><p>admin. (2019, July 24). Introducing LOCKR: A bioactive protein switch • baker lab. Baker Lab • UW Institute for Protein Design. <a href="https://www.bakerlab.org/2019/07/24/introducing-lockr-bioactive-protein-switch/">https://www.bakerlab.org/2019/07/24/introducing-lockr-bioactive-protein-switch/</a></p>
+</li>
+<li class="section-block"><p>CDC. (2024). Malaria diagnostic tests. Malaria. <a href="https://www.cdc.gov/malaria/hcp/diagnosis-testing/malaria-diagnostic-tests.html">https://www.cdc.gov/malaria/hcp/diagnosis-testing/malaria-diagnostic-tests.html</a></p>
+</li>
+<li class="section-block"><p>Kamyar Behrouzi, Fard, Z. K., Chen, C.-M., He, P., Teng, M., &amp; Lin, L. (2025). Plasmonic coffee-ring biosensing for AI-assisted point-of-care diagnostics. Nature Communications, 16(1). <a href="https://doi.org/10.1038/s41467-025-59868-y">https://doi.org/10.1038/s41467-025-59868-y</a></p>
+</li>
+<li class="section-block"><p>Kamyar Behrouzi, Fard, Z. K., Chen, C.-M., He, P., Teng, M., &amp; Lin, L. (2025). Plasmonic coffee-ring biosensing for AI-assisted point-of-care diagnostics. Nature Communications, 16(1). <a href="https://doi.org/10.1038/s41467-025-59868-y">https://doi.org/10.1038/s41467-025-59868-y</a></p>
+</li>
+<li class="section-block"><p>Ng, A. H., Nguyen, T. H., Gómez-Schiavon, M., Dods, G., Langan, R. A., Boyken, S. E., Samson, J. A., Waldburger, L. M., Dueber, J. E., Baker, D., &amp; El-Samad, H. (2019). Modular and tunable biological feedback control using a de novo protein switch. Nature, 572(7768), 265–269. <a href="https://doi.org/10.1038/s41586-019-1425-7">https://doi.org/10.1038/s41586-019-1425-7</a></p>
+</li>
+<li class="section-block"><p>Penna-Coutinho, J., Cortopassi, W. A., Oliveira, A. A., França, T. C. C., &amp; Krettli, A. U. (2011). Antimalarial activity of potential inhibitors of plasmodium falciparum lactate dehydrogenase enzyme selected by docking studies. PLoS ONE, 6(7), e21237. <a href="https://doi.org/10.1371/journal.pone.0021237">https://doi.org/10.1371/journal.pone.0021237</a></p>
+</li>
+<li class="section-block"><p>Sambe, B. S., Zobrist, S., Sheahan, W., Soni, D., Diagne, A., Sarr, I., Diatta, A. S., Diaw, S. O. M., Golden, A., Slater, H., Jang, I. K., Roa, N., Pal, S., Sarr, F. D., Faye, J., Vigan-Womas, I., Dieye, Y., Cisse, M., Domingo, G. J., &amp; Niang, M. (2025). Performance and usability evaluation of three LDH-based malaria rapid diagnostic tests in Kédougou, Senegal. Parasites &amp; Vectors, 18(1), 280. PubMed Central. <a href="https://doi.org/10.1186/s13071-025-06914-9">https://doi.org/10.1186/s13071-025-06914-9</a></p>
+</li>
+<li class="section-block"><p>Wan, L. (2025, May 8). ProteinMPNN sequence design: Turning RFdiffusion backbones into binder sequences. Ranomics Inc. Ranomics. <a href="https://www.ranomics.com/resource-hub/proteinmpnn-sequence-design-explained">https://www.ranomics.com/resource-hub/proteinmpnn-sequence-design-explained</a></p>
+</li>
+<li class="section-block"><p>Whitmarsh, C. (2025, June 3). Reprogramming discovery: MI300X GPUs power AI-Driven biology part 3. Advanced Micro Devices (AMD). AMD. <a href="https://www.amd.com/en/blogs/2025/reprogramming-discovery--mi300x-gpus-power-ai-driven-biology-par.html">https://www.amd.com/en/blogs/2025/reprogramming-discovery--mi300x-gpus-power-ai-driven-biology-par.html</a></p>
+</li>
+<li class="section-block"><p>World Health Organization. (2021). Rapid diagnostic tests. Www.Who.Int. <a href="https://www.who.int/teams/global-malaria-programme/case-management/diagnosis/rapid-diagnostic-tests">https://www.who.int/teams/global-malaria-programme/case-management/diagnosis/rapid-diagnostic-tests</a></p>
+</li>
+<li class="section-block"><p>World Health Organization. (2024, December 11). Malaria. World Health Organization. <a href="https://www.who.int/news-room/fact-sheets/detail/malaria">https://www.who.int/news-room/fact-sheets/detail/malaria</a></p>
+</li></ol>
+          </section></div>
+      </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+    <a id="back-to-top" href="#" aria-label="Back to top">⇧</a>
+    <script src="static/cursor.js"></script>
+    <script src="static/include.js"></script>
+    
+    <script src="static/wiki-toc.js?v=022a3252fdb1"></script>
+      <script src="static/carousel.js"></script>
+  
+
+
+</body></html>
