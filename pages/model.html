@@ -52,8 +52,121 @@
             <h3><span class="chapter-number" aria-hidden="true">03</span><span>HybriDock-Pep</span></h3>
 
           <div class="section-block">
-<p>--</p>
-
+<h4>Model Overview</h4>
+<p>HybriDock-Pep takes a peptide sequence as text and a receptor structure as a PDB file, and predicts the bound pose, the binding energy ΔG in kcal/mol, and the selectivity ΔΔG against another protein. It contains two main models: a score-based diffusion sampler that proposes peptide poses, and a gradient-boosted regressor trained on those generated poses. We built these models to leverage the power of machine learning in generating new poses quickly and accurately, while also addressing the weaknesses of outdated Monte Carlo based scoring-function models.</p>
+<a href="static/img/hybridock-pep/fig1-architecture.svg" target="_blank" rel="noopener"><img src="static/img/hybridock-pep/fig1-architecture.svg" alt="Architecture of HybriDock-Pep from inputs to outputs" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 1 | The stages of HybriDock-Pep, from the peptide and receptor inputs to the docked complex, ΔG and ΔΔG.</p>
+</div><div class="section-block">
+<h4>Model Description</h4>
+<h5>Diffusion Sampler</h5>
+<p>A peptide pose is a point on the product space R³ × SO(3) × T<sup>m</sup>, which combines the 3D Euclidean space of the peptide's position, the 3D rotations of its orientation, and an m-dimensional torus of its rotatable torsions (Corso et al., 2023). The pose is described by the position of its center, its orientation, and its rotatable torsions, which are split further into backbone and side-chain torsions. An added benefit is the SE(3)-equivariant architecture, which keeps the pose consistent when the same protein is translated or rotated. The process used to create noise during training is shown in Fig. 2.</p>
+<p>During training, each degree of freedom of the peptide is noised (randomized following a modified Gaussian distribution) according to the diffusion time <em>t</em>, where <em>t</em> = 1 is fully noised and <em>t</em> = 0 is fully denoised, following the function:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mi>σ</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>=</mo><msubsup><mi>σ</mi><mtext>min</mtext><mrow><mn>1</mn><mo>−</mo><mi>t</mi></mrow></msubsup><mo>⋅</mo><msubsup><mi>σ</mi><mtext>max</mtext><mi>t</mi></msubsup></mrow></math></p>
+<p class="eq-source">Source: Song et al. (2021); RAPiDock configuration (Zhao et al., 2025).</p>
+<p>The noise on the overall translation runs from 0.1 to 30 Å and on the overall rotation from 0.03 to 1.65 radians, while both backbone and side-chain torsions range from 0.0314 to 3.14 radians.</p>
+<p>As the peptide is noised following σ(<em>t</em>) = σ<sub>min</sub>(σ<sub>max</sub>/σ<sub>min</sub>)<sup><em>t</em></sup>, the spread of the noise grows at the rate:</p>
+<p><math display="block" style="display:block math;"><mrow><mfrac><mrow><mi>d</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="normal">ln</mi><mo>(</mo><mfrac><msub><mi>σ</mi><mtext>max</mtext></msub><msub><mi>σ</mi><mtext>min</mtext></msub></mfrac><mo>)</mo></mrow></math></p>
+<p>Furthermore, we use the following function to set the amount of noise added between steps, which limits the upper and lower bounds of the noise for the next step:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mi>g</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>=</mo><mrow><mi>σ</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>⋅</mo><msqrt><mrow><mn>2</mn><mi mathvariant="normal">ln</mi><mo>(</mo><mfrac><msub><mi>σ</mi><mtext>max</mtext></msub><msub><mi>σ</mi><mtext>min</mtext></msub></mfrac><mo>)</mo></mrow></msqrt></mrow></math></p>
+<p class="eq-source">Source: Song et al. (2021).</p>
+<p>During inference, the peptide starts as a cloud of random noise around the protein. As the diffusion time moves from 1 toward 0, the size of each noise step shrinks, from 101 Å for translation at <em>t</em> = 1 to 0.48 Å at the last step. For rotation we use the coefficient:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><msub><mi>g</mi><mtext>rot</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>=</mo><mn>2</mn><msub><mi>σ</mi><mtext>rot</mtext></msub><mo>⋅</mo><msqrt><mrow><mi mathvariant="normal">ln</mi><mo>(</mo><mfrac><msub><mi>σ</mi><mtext>rot,max</mtext></msub><msub><mi>σ</mi><mtext>rot,min</mtext></msub></mfrac><mo>)</mo></mrow></msqrt></mrow></math></p>
+<p>Then the model runs 16 Euler–Maruyama steps on <em>t</em><sub><em>k</em></sub> = 1 − <em>k</em>/16, so Δ<em>t</em> = 1/16:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>x</mi><mo>←</mo><mi>x</mi><mo>+</mo><msup><mrow><mi>g</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mn>2</mn></msup><mo>⋅</mo><mi>Δ</mi><mi>t</mi><mo>⋅</mo><msub><mi>s</mi><mi>θ</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>+</mo><mrow><mi>g</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>⋅</mo><msqrt><mrow><mi>Δ</mi><mi>t</mi></mrow></msqrt><mo>⋅</mo><mi>z</mi><mo>,</mo><mspace width="1.5em"></mspace><mi>z</mi><mo>∼</mo><mi>N</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>I</mi><mo>)</mo></mrow></math></p>
+<p class="eq-source">Source: Song et al. (2021); Anderson (1982).</p>
+<a href="static/img/model-hybridock/hdp-fig2-diffusion.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig2-diffusion.svg" alt="The pose space, the four noise kernels, the noise schedule and one reverse trajectory" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 2 | How the peptide is noised and denoised: the pose space, the four noise kernels, the noise schedule over the 16 steps, and one reverse trajectory onto MDM2.</p>
+<h5>Score Network</h5>
+<p>The score network is a Clebsch–Gordan tensor-product message-passing network that runs on receptor, peptide, and cross graphs:</p>
+<p><math display="block" style="display:block math;"><mrow><msubsup><mi>h</mi><mi>i</mi><mo>′</mo></msubsup><mo>=</mo><mtext>BatchNorm</mtext><mo>(</mo><msub><mtext>mean</mtext><mrow><mi>j</mi><mo>∈</mo><mi>N</mi><mo>(</mo><mi>i</mi><mo>)</mo></mrow></msub><mtext>TP</mtext><mo>(</mo><msub><mi>h</mi><mi>j</mi></msub><mo>⊗</mo><msub><mi>Y</mi><mi>l</mi></msub><mo>(</mo><msub><mover><mi>r</mi><mo>^</mo></mover><mtext>ij</mtext></msub><mo>)</mo><mo>;</mo><mi>w</mi><mo>(</mo><msub><mi>e</mi><mtext>ij</mtext></msub><mo>)</mo><mo>)</mo><mo>)</mo><mo>,</mo><mspace width="1.5em"></mspace><mi>l</mi><mo>≤</mo><mn>2</mn></mrow></math></p>
+<p class="eq-source">Source: Geiger &amp; Smidt (2022); Zhao et al. (2025).</p>
+<p>This equation models the information at each amino acid, represented by node <em>i</em>. For each amino acid it produces <em>h</em><sub><em>i</em></sub>′, a geometric tensor calculated from the normalized mean of TP over the neighboring amino acids <em>j</em>. The information from each neighbor <em>j</em> comes from the Clebsch–Gordan tensor product of <em>h</em><sub><em>j</em></sub> (the chemical data of amino acid <em>j</em>) and the spherical harmonics <em>Y</em><sub><em>l</em></sub> computed from the 3D direction between nodes <em>i</em> and <em>j</em>, all weighted by a factor <em>w</em>(<em>e</em><sub><em>ij</em></sub>) that depends on the distance from node <em>i</em> to node <em>j</em>.</p>
+<p>Receptor residues carry the ESM-2 embedding (1,280 dimensions; Lin et al., 2023), a large bidirectional BERT-style transformer encoder from Meta that encodes each residue into an embedding the rest of the model can use. The peptide graph links each residue to its 24 nearest neighbors. As the diffusion time <em>t</em> approaches 0, the function <em>c</em>(<em>t</em>) shrinks the radius within which receptor residues are joined to the peptide's residues by cross edges:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>c</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mn>40</mn><mtext>&#160;Å</mtext><mo>+</mo><mn>3</mn><msub><mi>σ</mi><mtext>tr</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo></mrow></math></p>
+<p class="eq-source">Source: RAPiDock configuration.</p>
+<p>In total, the network has about 7.56 million parameters (weights). Its output is given by four prediction heads: translation, rotation, backbone torsion, and side-chain torsion. To produce these outputs, each node takes part in four layers of Clebsch–Gordan tensor-product message passing, and in every layer each node passes 48 scalar and 10 vector channels.</p>
+<a href="static/img/model-hybridock/hdp-fig3-score-network.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig3-score-network.svg" alt="The score network" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 3 | The score network: the three graphs, the cross-edge radius, one tensor-product layer, the growth of the hidden representation and the four score heads.</p>
+<h5>Long Peptides and Blind Docking</h5>
+<p>Throughout our use of the original RAPiDock we identified some distinct failure points, and we responded by fine-tuning a specialized model for peptides of 13 or more amino acid residues. We purposely used a length-stratified dataset of 7,183 complexes that oversamples β-sheet and very long peptides, since these were the main failure points of the original RAPiDock. Our training settings are shown below, with the results afterwards.</p>
+<table>
+<thead>
+<tr><th>Setting</th><th>Value</th></tr>
+</thead>
+<tbody><tr><td>Learning rate</td><td>1e-5, cosine decay to a floor of 1e-7</td></tr><tr><td>Warmup</td><td>2 epochs</td></tr><tr><td>Batch</td><td>8 graphs per forward × gradient accumulation 2</td></tr><tr><td>Gradient clipping</td><td>1.0</td></tr><tr><td>EMA decay</td><td>0.999</td></tr><tr><td>Weight decay</td><td>1e-5</td></tr><tr><td>Epochs</td><td>20</td></tr></tbody></table>
+<p><strong>Raw long-peptide benchmark (77 complexes, 24 samples each, best-of-24 RMSD)</strong></p>
+<table>
+<thead>
+<tr><th>Model</th><th>≤2 Å</th><th>≤5 Å</th><th>Median RMSD</th><th>Mean RMSD</th></tr>
+</thead>
+<tbody><tr><td>Original</td><td>0/77</td><td>27/77</td><td>5.89 Å</td><td>8.85 Å</td></tr><tr><td>Original (Tanh model)</td><td>0/77</td><td>25/77</td><td>6.36 Å</td><td>8.65 Å</td></tr><tr><td><strong>Epoch 10 (best + shipped)</strong></td><td><strong>5/77</strong></td><td><strong>36/77</strong></td><td><strong>5.31 Å</strong></td><td><strong>8.06 Å</strong></td></tr></tbody></table>
+<a href="static/img/model-hybridock/hdp-fig4-long-peptides.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig4-long-peptides.svg" alt="Fine-tuning for long peptides" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 4 | The fine-tuning schedule, the checkpoint routing by peptide length, the training data and the raw long-peptide benchmark.</p>
+<h5>Clash Relief, Filtering and Clustering</h5>
+<p>Each pose is minimized in OpenMM with the ff14SB force field and implicit solvent (Eastman et al., 2017; Maier et al., 2015). The heavy atoms are held in place by a harmonic restraint, which works like a spring holding them to their original positions:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>k</mi><msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><mspace width="1.5em"></mspace><mi>k</mi><mo>=</mo><mn>50,000</mn><mtext>&#160;kJ/mol/nm²</mtext></mrow></math></p>
+<p class="eq-source">Source: Harmonic positional restraint.</p>
+<p>The spring stiffness is 50,000 kJ/mol/nm², so moving a heavy atom by 1 Å costs 59.8 kcal/mol. A pose is reverted if any heavy atom moves more than 0.5 Å, so the minimizer resolves overlaps without rearranging the pose.</p>
+<p>Poses found more than 35 Å from the binding site are not continued down the pipeline, and AutoDock Vina optimizes the remaining poses and removes those with protein–peptide atom pairs closer than 1.5 Å (Eberhardt et al., 2021). The remaining poses are then clustered on contact-zone Cα-RMSD with average linkage, and the number of clusters <em>k</em>, from 2 to min(15, ⌊<em>n</em>/5⌋), is chosen by the highest silhouette score (Rousseeuw, 1987), as shown in Fig. 5.</p>
+<h5>Affinity Model</h5>
+<p>The output ΔG in kcal/mol comes from a HistGradientBoostingRegressor (Pedregosa et al., 2011), trained on labels calculated with the formula:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>Δ</mi><mi>G</mi><mo>=</mo><mi>R</mi><mi>T</mi><mi mathvariant="normal">ln</mi><msub><mi>K</mi><mi>d</mi></msub></mrow></math></p>
+<p class="eq-source">Source: Standard thermodynamics (1 M standard state).</p>
+<table>
+<thead>
+<tr><th>Block</th><th>Count</th><th>Content</th></tr>
+</thead>
+<tbody><tr><td>Interface geometry</td><td>16</td><td>Pocket composition, buried and hydrogen-bond surface, aromatic contacts, Miyazawa–Jernigan contact energy</td></tr><tr><td>Peptide ProtDCal descriptors</td><td>220</td><td>22 residue-property scales × 10 aggregations</td></tr><tr><td>Charge complementarity</td><td>3</td><td>Peptide versus receptor charges</td></tr><tr><td>Peptide length</td><td>1</td><td>Length of the peptide, which correlates with its entropy</td></tr><tr><td>Pocket ProtDCal descriptors</td><td>22</td><td>Descriptors of the contact and near-contact residues</td></tr></tbody></table>
+<p class="eq-source">Source: Shrake &amp; Rupley (1973); Miyazawa &amp; Jernigan (1996); Ruiz-Blanco et al. (2015).</p>
+<p>After creating our original crystal scoring model, we used it to score RAPiDock-generated poses and found that it did very poorly, with the correlation falling from <em>r</em> = 0.53 to <em>r</em> = 0.06. We identified the key problem, mainly that RAPiDock places peptides slightly farther from the best position than a crystal structure does, so we recalibrated the scorer on RAPiDock poses. This lets us perform at nearly the same level as the crystal scorer.</p>
+<a href="static/img/model-hybridock/hdp-fig5-pipeline-affinity.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig5-pipeline-affinity.svg" alt="Clash relief, the pose funnel, clustering, the affinity model and the link between dG and Kd" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 5 | Clash relief, the pose funnel, clustering, the affinity model, the effect of training on generated poses, and what an error in ΔG means for Kd.</p>
+<h5>Selectivity, Anchoring and Mutations</h5>
+<p>Predicting absolute ΔG across different proteins is very hard, even for us, so we also provide a selectivity feature, computed by:</p>
+<p><math display="block" style="display:block math;"><mrow><mi>Δ</mi><mi>Δ</mi><mi>G</mi><mo>=</mo><msub><mrow><mi>Δ</mi><mi>G</mi></mrow><mi>T</mi></msub><mo>−</mo><msub><mrow><mi>Δ</mi><mi>G</mi></mrow><mi>O</mi></msub></mrow></math></p>
+<p>This option lets the user run HybriDock-Pep on a target <em>T</em> and an off-target <em>O</em>, averaging the top 10 poses from each in order to compare the best of both. The user then receives the scores and a 95% interval from 1,000 bootstrap resamples of the top-10 scores. The score used is the MM-GBSA ΔG when MM-GBSA was run, and the Vina score otherwise.</p>
+<p>We also provide anchoring, which allows better predictions. It subtracts the per-receptor offset using two or three measured affinities on the same receptor, which raises the within-receptor <em>r</em> from about 0.47 to 0.71. It is computed with the formula:</p>
+<p><math display="block" style="display:block math;"><mrow><msub><mrow><mi>Δ</mi><mi>G</mi></mrow><mtext>pred</mtext></msub><mrow><mo>(</mo><mi>P</mi><mo>,</mo><mi>R</mi><mo>)</mo></mrow><mo>=</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>w</mi><mi>k</mi></msub><mo>⋅</mo><mo>[</mo><msub><mrow><mi>Δ</mi><mi>G</mi></mrow><mtext>exp</mtext></msub><mo>(</mo><msub><mtext>ref</mtext><mi>k</mi></msub><mo>)</mo><mo>+</mo><mrow><mi>S</mi><mrow><mo>(</mo><mi>P</mi><mo>,</mo><mi>R</mi><mo>)</mo></mrow></mrow><mo>−</mo><mrow><mi>S</mi><mo>(</mo><msub><mtext>ref</mtext><mi>k</mi></msub><mo>,</mo><mi>R</mi><mo>)</mo></mrow><mo>]</mo></mrow></math></p>
+<p>where <em>S</em>(<em>P</em>, <em>R</em>) is the absolute score predicted by our model, which can be written as:</p>
+<p><math display="block" style="display:block math;"><mrow><mrow><mi>S</mi><mrow><mo>(</mo><mi>P</mi><mo>,</mo><mi>R</mi><mo>)</mo></mrow></mrow><mo>=</mo><mrow><mi>Δ</mi><mi>G</mi></mrow><mrow><mo>(</mo><mi>P</mi><mo>,</mo><mi>R</mi><mo>)</mo></mrow><mo>+</mo><mi>b</mi><mo>(</mo><mi>R</mi><mo>)</mo><mo>+</mo><mi>c</mi><mo>(</mo><mi>P</mi><mo>)</mo><mo>+</mo><mi>η</mi></mrow></math></p>
+<p>Here ΔG(<em>P</em>, <em>R</em>) is the true binding free energy, <em>b</em>(<em>R</em>) is the offset of the receptor, <em>c</em>(<em>P</em>) is the offset of the peptide, and η is noise. Substituting this into the formula above, <em>b</em>(<em>R</em>) cancels from every anchor, leaving only <em>c</em>(<em>P</em>) − <em>c</em>(ref<sub><em>k</em></sub>) from each anchor and a combination of noise.</p>
+<p>Lastly, the absolute scorer cannot predict single-residue changes accurately (<em>r</em> = 0.183 on 19 OppA tripeptides), so a separate model was trained on SKEMPI v2 (Jankauskaitė et al., 2019) to predict ΔΔG for single mutations, with a leave-complex-out correlation of <em>r</em> = 0.385.</p>
+<a href="static/img/model-hybridock/hdp-fig6-relative-estimators.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig6-relative-estimators.svg" alt="The offset model, anchoring, selectivity and the mutation head" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 6 | The offset model behind anchoring, the experiments that tested it, why only differences of offsets can be identified, the selectivity bootstrap and the single-mutation head.</p>
+</div><div class="section-block">
+<h4>Validation</h4>
+<p>Complexes are clustered by sequence identity and whole clusters are held out in each fold, so no homolog of a test complex is in training. The identity measure takes the placement of residues into account. Our first version used a free-gap alignment that scored GGA and ACC as 0.33, which collapsed 925 peptides into 21 clusters at 30% identity and gave a spuriously low <em>r</em>. The corrected measure gives 410 clusters, and we report the corrected numbers. The clustered <em>r</em> (0.35) is below the random-split <em>r</em> (0.44) on the same data, as expected. Across all cutoffs the MAE stays between 1.32 and 1.42 kcal/mol while <em>r</em> falls and levels off near 0.32, so the error in kcal/mol is the number we trust. We compared against a clone of PPI-Affinity (Romero-Molina et al., 2022) on identical folds, because its server has been down since 2022.</p>
+</div><div class="section-block">
+<h4>Results</h4>
+<table>
+<thead>
+<tr><th>Test</th><th>Result</th><th>Verdict</th></tr>
+</thead>
+<tbody><tr><td>Median pose error, 247 complexes</td><td>3.51 Å, against 3.63 Å for RAPiDock</td><td>Better than RAPiDock, Boltz-2, ADCP and ESMFold on our set, and, through RAPiDock's published results, better than AlphaFold2-Multimer, AlphaFold3, GOLD, HADDOCK, MDockPeP and HPEPDOCK</td></tr><tr><td>ΔG against a PPI-Affinity clone, 865 complexes</td><td>MAE 1.35, <em>r</em> 0.352 (clone: 1.46, 0.210)</td><td>Validated on identical folds</td></tr><tr><td>ΔG, full PDBbind peptide set, 925 complexes</td><td>MAE 1.40, <em>r</em> 0.321</td><td>Our best attempt</td></tr><tr><td>ΔG, external holdout of 43 complexes</td><td>MAE 1.60, <em>r</em> 0.44</td><td>–</td></tr><tr><td>ΔG on our own generated poses, 151 complexes</td><td>MAE 1.51, <em>r</em> 0.501</td><td>–</td></tr><tr><td>Anchoring with 2 or more measured values</td><td>Within-receptor <em>r</em> 0.71</td><td>Validated, useful for designing new peptides for existing, scored proteins</td></tr><tr><td>Selectivity against measurement</td><td><em>r</em> 0.30 to 0.45</td><td>–</td></tr></tbody></table>
+<p>RAPiDock itself outperforms AlphaFold2-Multimer, AlphaFold3, ADCP, GOLD, HADDOCK, MDockPeP and HPEPDOCK in the RAPiDock paper (Zhao et al., 2025; Fig. 7f), and HybriDock-Pep improves on RAPiDock on our matched sets: a median Cα-RMSD of 3.51 Å against 3.63 Å, and a higher cumulative DockQ at top-1 across 387 length-balanced complexes (Fig. 8). We did not rerun every other tool on our own sets, so our advantage over them comes through RAPiDock.</p>
+<a href="static/img/model-hybridock/hdp-fig7-validation.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig7-validation.svg" alt="Validation and results against other tools" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 7 | The identity sweep, the matched comparison with a PPI-Affinity clone, error across test sets, pose accuracy, predicted against measured ΔG, the published RAPiDock results, and the MDM2 and p53 example.</p>
+<a href="static/img/hybridock-pep/fig8-length-split.png" target="_blank" rel="noopener"><img src="static/img/hybridock-pep/fig8-length-split.png" alt="Success by peptide length and cumulative DockQ on 387 held-out complexes" title="Click to open the full-size figure" style="max-width:92%;display:block;margin:1.5em auto"></a>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 8 | Success by peptide length and cumulative DockQ on 387 held-out complexes, HybriDock-Pep against RAPiDock, ADCP, ESMFold and Boltz-2.</p>
+<h5>Example: MDM2 cancer protein and p53 peptide</h5>
+<table>
+<thead>
+<tr><th>Quantity</th><th>Predicted</th><th>Measured</th><th>Difference</th></tr>
+</thead>
+<tbody><tr><td>ΔG on the crystal pose (PDB 1YCR)</td><td>−9.28 kcal/mol</td><td>−8.5 kcal/mol</td><td>0.8 (factor of 3.7 in Kd)</td></tr><tr><td>ΔG, docked from scratch, 100 poses</td><td>−9.40 kcal/mol</td><td>−8.5 kcal/mol</td><td>0.9 (factor of 4.6 in Kd)</td></tr><tr><td>Pose Cα-RMSD to the crystal</td><td>0.80 Å</td><td>—</td><td>3.54 Å for DiffPepDock</td></tr></tbody></table>
+<h5>Validity and Limitations</h5>
+<ul>
+<li>Without a novel and effective way to calculate entropy and enthalpy across peptide states, it is difficult to predict protein–peptide ΔG in kcal/mol in absolute terms.</li>
+<li>We struggle even more with charged peptides. Although custom methods such as multi-dimensional tensor-based interaction gradienting have shown some success, charged peptides remain very hard to model without running individual quantum-mechanical hybrid force-field simulations.</li>
+<li>We also struggle heavily with designed binders that have deep, conformationally changing grooves. On 18 designed binders and 18 peptides (Wu et al., 2025), the shortlist contained the true partner in only 15 of 18 rows on novel cases.</li>
+</ul>
+<h5>Future Improvements &amp; Next Steps</h5>
+<ul>
+<li>Introduce more advanced multi-dimensional tensor-based interaction gradient methods to account for desolvation without modelling it explicitly.</li>
+<li>Add features that let the scorer take a molecular dynamics simulation, lengthen it using machine learning (the same primary idea as Nvidia DLSS 5 or Apple MetalFX), and predict the score over a conformationally changing protein–peptide complex, so the scorer can use more than a single static pose.</li>
+<li>Improve the anchoring features and focus on them more.</li>
+<li>Add a per-prediction confidence flag.</li>
+</ul>
 </div></section><section class="wiki-section toc-section" id="lockr-integration">
             <h3><span class="chapter-number" aria-hidden="true">02</span><span>LOCKR Integration</span></h3>
 
@@ -1424,6 +1537,59 @@ For our droplets, this predicts a ring about 5 µm. This is 120 times narrower t
 
 </div><div class="section-block">
   <h4 class="section-block-label">HybriDock-Pep</h4>
+<p>Abramson, J. et al. (2024). Accurate structure prediction of biomolecular interactions with AlphaFold 3. <em>Nature</em> 630, 493–500.</p>
+
+<p>Anderson, B. D. O. (1982). Reverse-time diffusion equation models. <em>Stochastic Processes and their Applications</em> 12, 313–326.</p>
+
+<p>Basu, S. &amp; Wallner, B. (2016). DockQ: a quality measure for protein-protein docking models. <em>PLoS ONE</em> 11, e0161879.</p>
+
+<p>Corso, G. et al. (2023). DiffDock: diffusion steps, twists, and turns for molecular docking. <em>ICLR</em>.</p>
+
+<p>Eastman, P. et al. (2017). OpenMM 7: rapid development of high performance algorithms for molecular dynamics. <em>PLOS Comput. Biol.</em> 13, e1005659.</p>
+
+<p>Eberhardt, J. et al. (2021). AutoDock Vina 1.2.0: new docking methods, expanded force field, and Python bindings. <em>J. Chem. Inf. Model.</em> 61, 3891–3898.</p>
+
+<p>Evans, R. et al. (2022). Protein complex prediction with AlphaFold-Multimer. <em>bioRxiv</em> 10.1101/2021.10.04.463034.</p>
+
+<p>Geiger, M. &amp; Smidt, T. (2022). e3nn: Euclidean neural networks. <em>arXiv</em> 2207.09453.</p>
+
+<p>Jankauskaitė, J. et al. (2019). SKEMPI 2.0: an updated benchmark of changes in protein–protein binding energy, kinetics and thermodynamics upon mutation. <em>Bioinformatics</em> 35, 462–469.</p>
+
+<p>Jones, G., Willett, P., Glen, R. C., Leach, A. R. &amp; Taylor, R. (1997). Development and validation of a genetic algorithm for flexible docking. <em>J. Mol. Biol.</em> 267, 727–748.</p>
+
+<p>Lensink, M. F., Nadzirin, N., Velankar, S. &amp; Wodak, S. J. (2020). Modeling protein-protein, protein-peptide, and protein-oligosaccharide complexes: CAPRI 7th edition. <em>Proteins</em> 88, 916–938.</p>
+
+<p>Lin, Z. et al. (2023). Evolutionary-scale prediction of atomic-level protein structure with a language model. <em>Science</em> 379, 1123–1130.</p>
+
+<p>Maier, J. A. et al. (2015). ff14SB: improving the accuracy of protein side chain and backbone parameters from ff99SB. <em>J. Chem. Theory Comput.</em> 11, 3696–3713.</p>
+
+<p>Miyazawa, S. &amp; Jernigan, R. L. (1996). Residue–residue potentials with a favorable contact pair term and an unfavorable high packing density term, for simulation and threading. <em>J. Mol. Biol.</em> 256, 623–644.</p>
+
+<p>Passaro, S. et al. (2025). Boltz-2: towards accurate and efficient binding affinity prediction. <em>bioRxiv</em>.</p>
+
+<p>Pedregosa, F. et al. (2011). Scikit-learn: machine learning in Python. <em>J. Mach. Learn. Res.</em> 12, 2825–2830.</p>
+
+<p>Romero-Molina, S. et al. (2022). PPI-Affinity: a web tool for the prediction and optimization of protein–peptide and protein–protein binding affinity. <em>J. Proteome Res.</em> 21, 1829–1841.</p>
+
+<p>Rousseeuw, P. J. (1987). Silhouettes: a graphical aid to the interpretation and validation of cluster analysis. <em>J. Comput. Appl. Math.</em> 20, 53–65.</p>
+
+<p>Ruiz-Blanco, Y. B. et al. (2015). ProtDCal: a program to compute general-purpose-numerical descriptors for sequences and 3D-structures of proteins. <em>J. Cheminformatics</em> 7, 19.</p>
+
+<p>Shrake, A. &amp; Rupley, J. A. (1973). Environment and exposure to solvent of protein atoms: lysozyme and insulin. <em>J. Mol. Biol.</em> 79, 351–371.</p>
+
+<p>Song, Y. et al. (2021). Score-based generative modeling through stochastic differential equations. <em>ICLR</em>.</p>
+
+<p>Trellet, M., Melquiond, A. S. J. &amp; Bonvin, A. M. J. J. (2013). A unified conformational selection and induced fit approach to protein-peptide docking. <em>PLoS ONE</em> 8, e58769.</p>
+
+<p>Wu et al. (2025). <em>Science</em> (Fig. 2B, the 18 × 18 specificity grid).</p>
+
+<p>Xu, X., Yan, C. &amp; Zou, X. (2018). MDockPeP: an ab-initio protein-peptide docking server. <em>J. Comput. Chem.</em> 39, 2409–2413.</p>
+
+<p>Zhang, Y. &amp; Sanner, M. F. (2019). AutoDock CrankPep: combining folding and docking to predict protein-peptide complexes. <em>Bioinformatics</em> 35, 5121–5127.</p>
+
+<p>Zhao, H. et al. (2025). Protein–peptide docking with a rational and accurate diffusion generative model. <em>Nat. Mach. Intell.</em> 7, 1308.</p>
+
+<p>Zhou, P., Jin, B., Li, H. &amp; Huang, S.-Y. (2018). HPEPDOCK: a web server for blind peptide-protein docking based on a hierarchical algorithm. <em>Nucleic Acids Res.</em> 46, W443–W450.</p>
 
 </div><div class="section-block">
   <h4 class="section-block-label">LOCKR Integration</h4>
