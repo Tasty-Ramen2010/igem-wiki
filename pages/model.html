@@ -88,7 +88,7 @@
 <a href="static/img/model-hybridock/hdp-fig3-score-network.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig3-score-network.svg" alt="The score network" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
 <p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 3 | The score network: the three graphs, the cross-edge radius, one tensor-product layer, the growth of the hidden representation and the four score heads.</p>
 <h5>Long Peptides and Blind Docking</h5>
-<p>Throughout our use of the original RAPiDock we identified some distinct failure points, and we responded by fine-tuning a specialized model for peptides of 13 or more amino acid residues. It was trained in three phases: first only the backbone-torsion convolution was unfrozen across epochs, then the four cross-graph convolutional layers were added, and finally everything was unfrozen. We purposely used a length-stratified dataset of 7,183 complexes that oversamples β-sheet and very long peptides, since these were the main failure points of the original RAPiDock. Our training settings are shown below, with the results afterwards.</p>
+<p>Throughout our use of the original RAPiDock we identified some distinct failure points, and we responded by fine-tuning a specialized model for peptides of 13 or more amino acid residues. We purposely used a length-stratified dataset of 7,183 complexes that oversamples β-sheet and very long peptides, since these were the main failure points of the original RAPiDock. Our training settings are shown below, with the results afterwards.</p>
 <table>
 <thead>
 <tr><th>Setting</th><th>Value</th></tr>
@@ -101,7 +101,7 @@
 </thead>
 <tbody><tr><td>Original</td><td>0/77</td><td>27/77</td><td>5.89 Å</td><td>8.85 Å</td></tr><tr><td>Original (Tanh model)</td><td>0/77</td><td>25/77</td><td>6.36 Å</td><td>8.65 Å</td></tr><tr><td><strong>Epoch 10 (best + shipped)</strong></td><td><strong>5/77</strong></td><td><strong>36/77</strong></td><td><strong>5.31 Å</strong></td><td><strong>8.06 Å</strong></td></tr></tbody></table>
 <a href="static/img/model-hybridock/hdp-fig4-long-peptides.svg" target="_blank" rel="noopener"><img src="static/img/model-hybridock/hdp-fig4-long-peptides.svg" alt="Fine-tuning for long peptides" title="Click to open the full-size figure" style="max-width:96%;display:block;margin:1.5em auto"></a>
-<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 4 | The fine-tuning schedule, the three training phases, the training data and the raw long-peptide benchmark.</p>
+<p style="text-align:center;font-style:italic;font-size:0.9em;color:#666;margin-top:0.4em">Fig. 4 | The fine-tuning schedule, the checkpoint routing by peptide length, the training data and the raw long-peptide benchmark.</p>
 <h5>Clash Relief, Filtering and Clustering</h5>
 <p>Each pose is minimized in OpenMM with the ff14SB force field and implicit solvent (Eastman et al., 2017; Maier et al., 2015). The heavy atoms are held in place by a harmonic restraint, which works like a spring holding them to their original positions:</p>
 <p><math display="block" style="display:block math;"><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>k</mi><msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><mspace width="1.5em"></mspace><mi>k</mi><mo>=</mo><mn>50,000</mn><mtext>&#160;kJ/mol/nm²</mtext></mrow></math></p>
